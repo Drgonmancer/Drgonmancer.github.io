@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>蔡昕辰 · AI 应用开发工程师 | LangGraph 多 Agent · FastAPI 后端</title>
+<meta name="description" content="蔡昕辰（Cai Xinchen）的个人主页 —— AI 应用开发工程师，软件工程本科 2026 届。专注 LangGraph 多 Agent 编排、FastAPI 异步后端与企业级容器化部署。">
+<meta name="author" content="蔡昕辰">
+<meta property="og:type" content="website">
+<meta property="og:title" content="蔡昕辰 · AI 应用开发工程师">
+<meta property="og:description" content="LangGraph 多 Agent 编排 · FastAPI 异步后端 · 企业级部署。">
+<meta property="og:image" content="avatar.jpg">
+<link rel="canonical" href="https://drgonmancer.github.io/">
+<meta name="theme-color" content="#05060B">
+<!-- 声明为暗色页面：浏览器据此把滚动条、表单控件、加载底色都渲染成暗色，避免白闪 -->
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="蔡昕辰,AI 应用开发工程师,LangGraph,多 Agent,FastAPI,Python,RAG,南京工业大学浦江学院">
+<meta property="og:url" content="https://drgonmancer.github.io/">
+<meta property="og:site_name" content="蔡昕辰 · 个人主页">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="蔡昕辰 · AI 应用开发工程师">
+<meta name="twitter:description" content="LangGraph 多 Agent 编排 · FastAPI 异步后端 · 企业级容器化部署。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236366F1'/%3E%3Cstop offset='1' stop-color='%23A855F7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Ctext x='32' y='45' font-family='system-ui,-apple-system,sans-serif' font-size='34' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E">
+<!-- 字体自托管：预先加载首屏要用到的两个字重文件（Noto Sans SC 覆盖全部中文，Inter 覆盖拉丁） -->
+<link rel="preload" href="fonts/noto-sans-sc-subset.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/inter-subset.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* ==========================================================================
+   字体（自托管 · 已按本页实际字符集子集化）
+   --------------------------------------------------------------------------
+   原方案：@import 引入 Google Fonts —— 570KB 渲染阻塞 CSS + 566 条 @font-face
+            + 约 1.2MB 字体分片，且在中国大陆访问 fonts.googleapis.com 不稳定，
+            一旦超时整页会回退到系统字体，设计直接垮掉。
+   现方案：3 个可变字体文件共 209KB，单文件覆盖全部字重（wght 轴），
+            零第三方请求、可离线、大陆访问无风险。
+   ========================================================================== */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;          /* 可变字体：一个字重区间覆盖全部 */
+  font-display: swap;
+  src: url('fonts/inter-subset.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('fonts/jetbrains-mono-subset.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('fonts/noto-sans-sc-subset.woff2') format('woff2');
+}
+
+/* ==========================================================================
+   蔡昕辰 · 个人主页 | 液态玻璃 Liquid Glass
+   设计规则：真实玻璃折射（backdrop blur + 内高光 + 渐变描边）/
+             深空底 + 多色光斑缓动漂浮 / 超大圆角与胶囊 /
+             鼠标跟随镜面高光 / 悬浮动态岛导航 / 极简无衬线排版
+   断点：1080px 收起导航链接并启用汉堡菜单；760px 全部转单列
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --bg:      #05060B;
+  --ink:     #F4F6FB;
+  --ink-2:   #B9C0D4;
+  --ink-3:   #7C859E;
+  --indigo:  #6366F1;
+  --violet:  #A855F7;
+  --cyan:    #22D3EE;
+  --rose:    #FB7185;
+  --glass-bg: linear-gradient(160deg, rgba(255,255,255,.115), rgba(255,255,255,.042));
+  --glass-bd: rgba(255,255,255,.145);
+  --glass-sh: inset 0 1px 0 rgba(255,255,255,.28), inset 0 -1px 0 rgba(255,255,255,.05),
+              0 26px 60px -24px rgba(0,0,0,.7);
+  --r-xl: 34px;
+  --r-lg: 26px;
+  --r-md: 18px;
+  --sans: 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', 'Noto Sans SC', ui-monospace, monospace;
+}
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.7;
+  font-weight: 400;
+  letter-spacing: -.005em;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 { margin: 0; font-weight: 800; line-height: 1.08; letter-spacing: -.035em; }
+p { margin: 0; }
+ul { margin: 0; padding: 0; list-style: none; }
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+b, strong { font-weight: 600; color: #fff; }
+
+:focus-visible { outline: 2px solid rgba(255,255,255,.8); outline-offset: 3px; border-radius: 6px; }
+
+.wrap { width: min(1200px, 100% - 40px); margin-inline: auto; position: relative; z-index: 2; }
+.mono { font-family: var(--mono); }
+.eyebrow {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--ink-3);
+}
+.grad-text {
+  background: linear-gradient(100deg, #fff 10%, #C7B9FF 45%, #8FE9FF 90%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* ---------- 背景光斑 ---------- */
+.aurora { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.blob { position: absolute; border-radius: 50%; filter: blur(96px); opacity: .55; will-change: transform; }
+.blob.b1 { width: 640px; height: 640px; left: -14%; top: -16%; background: var(--indigo); animation: f1 26s ease-in-out infinite; }
+.blob.b2 { width: 560px; height: 560px; right: -6%; top: -10%; background: var(--violet); opacity: .5; animation: f2 32s ease-in-out infinite; }
+.blob.b3 { width: 480px; height: 480px; left: 24%; top: 46%;     background: var(--cyan);   opacity: .3; animation: f3 29s ease-in-out infinite; }
+.blob.b4 { width: 460px; height: 460px; right: 4%; bottom: -14%; background: var(--rose);  opacity: .34; animation: f2 36s ease-in-out infinite reverse; }
+.blob.b5 { width: 420px; height: 420px; left: 46%; top: 6%;      background: #4F46E5;      opacity: .4; animation: f3 24s ease-in-out infinite reverse; }
+@keyframes f1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(80px,60px) scale(1.12); } }
+@keyframes f2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-70px,90px) scale(1.16); } }
+@keyframes f3 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(60px,-70px) scale(1.1); } }
+
+.grain {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: .16;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+}
+
+/* ---------- 玻璃基类 ---------- */
+.glass {
+  position: relative; border-radius: var(--r-lg);
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid var(--glass-bd);
+  box-shadow: var(--glass-sh);
+}
+/* 顶部一道折射高光 */
+.glass::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,.14), transparent 26%);
+  mix-blend-mode: screen;
+}
+
+/* 鼠标跟随镜面高光 */
+.spec { overflow: hidden; }
+.spec::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  opacity: 0; transition: opacity .35s ease;
+  background: radial-gradient(460px circle at var(--mx, 50%) var(--my, 0%), rgba(255,255,255,.16), transparent 62%);
+}
+.spec:hover::after { opacity: 1; }
+
+/* ---------- 动态岛导航 ---------- */
+.island-wrap { position: fixed; top: 18px; left: 0; right: 0; z-index: 80; display: flex; justify-content: center; padding: 0 16px; pointer-events: none; }
+.island {
+  pointer-events: auto;
+  display: flex; align-items: center; gap: 4px; padding: 7px 8px;
+  border-radius: 999px;
+  background: rgba(20, 22, 34, .55);
+  backdrop-filter: blur(34px) saturate(190%);
+  -webkit-backdrop-filter: blur(34px) saturate(190%);
+  border: 1px solid rgba(255,255,255,.13);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.24), 0 18px 44px -18px rgba(0,0,0,.85);
+  transition: padding .35s cubic-bezier(.4,0,.2,1), transform .35s ease;
+}
+.island .brand { display: flex; align-items: center; gap: 9px; padding: 5px 13px 5px 8px; }
+.island .avatar-mini {
+  width: 26px; height: 26px; border-radius: 50%; overflow: hidden; flex: none;
+  background: linear-gradient(140deg, var(--indigo), var(--violet));
+  display: grid; place-items: center; font-size: 12px; font-weight: 700;
+}
+.island .avatar-mini img { width: 100%; height: 100%; object-fit: cover; }
+.island .brand-name { font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+.island .links { display: flex; align-items: center; gap: 2px; }
+.island .links a {
+  font-size: 13.5px; font-weight: 500; color: var(--ink-2); white-space: nowrap;
+  padding: 7px 14px; border-radius: 999px;
+  transition: color .22s ease, background .22s ease, box-shadow .22s ease;
+}
+.island .links a:hover { color: #fff; background: rgba(255,255,255,.1); }
+.island .links a[aria-current="true"] {
+  color: #fff; background: linear-gradient(135deg, rgba(99,102,241,.85), rgba(168,85,247,.75));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 6px 18px -6px rgba(99,102,241,.9);
+}
+.island .cta {
+  margin-left: 4px; font-size: 13.5px; font-weight: 600; color: #fff;
+  padding: 8px 16px; border-radius: 999px;
+  background: linear-gradient(135deg, var(--indigo), var(--violet));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 8px 22px -8px rgba(124,58,237,.95);
+  transition: transform .22s ease, box-shadow .22s ease;
+}
+.island .cta:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 12px 28px -8px rgba(124,58,237,1); }
+.island-mini { display: none; }
+
+/* ---------- 按钮 ---------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 13px 24px; border-radius: 999px;
+  font-size: 14.5px; font-weight: 600; cursor: pointer;
+  border: 1px solid rgba(255,255,255,.16);
+  transition: transform .22s cubic-bezier(.4,0,.2,1), box-shadow .22s ease, background .22s ease;
+  font-family: var(--sans);
+}
+.btn:hover { transform: translateY(-2px); }
+.btn-primary {
+  color: #fff; border-color: transparent;
+  background: linear-gradient(135deg, var(--indigo), var(--violet));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 16px 34px -14px rgba(124,58,237,1);
+}
+.btn-primary:hover { box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 22px 44px -14px rgba(124,58,237,1); }
+.btn-glass {
+  color: var(--ink);
+  background: linear-gradient(160deg, rgba(255,255,255,.15), rgba(255,255,255,.06));
+  backdrop-filter: blur(20px) saturate(170%);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 14px 30px -16px rgba(0,0,0,.8);
+}
+.btn-glass:hover { background: linear-gradient(160deg, rgba(255,255,255,.22), rgba(255,255,255,.09)); }
+.btn svg { width: 17px; height: 17px; flex: none; }
+.btn-sm { padding: 10px 17px; font-size: 13px; }
+
+/* ---------- 药丸 ---------- */
+.pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 999px;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+  font-size: 12.5px; font-weight: 500; color: var(--ink-2);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+.dot-live { width: 7px; height: 7px; border-radius: 50%; background: #34D399; box-shadow: 0 0 0 0 rgba(52,211,153,.7); animation: pulse 2.4s ease-out infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(52,211,153,.65); } 70% { box-shadow: 0 0 0 9px rgba(52,211,153,0); } 100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); } }
+
+.tag {
+  display: inline-block; padding: 4px 11px; border-radius: 999px;
+  font-size: 12px; font-weight: 500; color: var(--ink-2);
+  background: rgba(255,255,255,.065); border: 1px solid rgba(255,255,255,.1);
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+.tag:hover { background: rgba(255,255,255,.13); color: #fff; }
+.tag-dim { color: var(--ink-3); background: rgba(255,255,255,.03); border-style: dashed; }
+.tag-accent { color: #fff; background: linear-gradient(135deg, rgba(99,102,241,.5), rgba(168,85,247,.42)); border-color: rgba(255,255,255,.22); }
+
+/* ---------- Hero ---------- */
+.hero { padding: 148px 0 0; }
+.hero-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 44px; align-items: center; }
+.hero h1 { font-size: clamp(40px, 6.2vw, 82px); margin: 22px 0 0; }
+.hero-role { margin-top: 18px; font-size: clamp(14px, 1.6vw, 17px); color: var(--ink-2); font-weight: 500; }
+.hero-role b { color: #fff; font-weight: 600; }
+.hero-desc { margin-top: 24px; max-width: 56ch; color: var(--ink-2); font-size: 16px; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
+.hero-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+
+.profile { padding: 22px; border-radius: var(--r-xl); }
+.profile-top { display: flex; align-items: center; gap: 16px; }
+.profile-img {
+  width: 92px; height: 92px; border-radius: 26px; overflow: hidden; flex: none;
+  background: linear-gradient(140deg, var(--indigo), var(--violet));
+  display: grid; place-items: center; font-size: 34px; font-weight: 800;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 14px 30px -12px rgba(124,58,237,.9);
+}
+.profile-img img { width: 100%; height: 100%; object-fit: cover; }
+.profile-name { font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
+.profile-sub { font-size: 13px; color: var(--ink-3); margin-top: 3px; }
+.profile-rows { margin-top: 20px; border-top: 1px solid rgba(255,255,255,.09); }
+.profile-rows div { display: flex; justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,.07); font-size: 13.5px; }
+.profile-rows dt { color: var(--ink-3); }
+.profile-rows dd { margin: 0; text-align: right; color: var(--ink); }
+
+/* ---------- 指标 ---------- */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 90px; }
+.stat { padding: 24px 22px; border-radius: var(--r-lg); }
+.stat-num { font-size: clamp(26px, 3.1vw, 40px); font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+.stat-label { font-size: 13px; color: var(--ink-3); margin-top: 12px; line-height: 1.6; }
+
+/* ---------- 区块 ---------- */
+/* 注：这里试过给 .sec 加 content-visibility: auto 跳过屏外渲染，最终放弃。
+   实测各区块真实高度——桌面 about 944 / skills 886 / work 1211 / projects 906 / contact 670，
+   移动端则是 1411 / 1645 / 1791 / 2051 / 931，同一个 contain-intrinsic-size
+   无法兼顾两个断点（用 1100px 时首次加载总高比实际多 813px），
+   滚动条长度会明显跳变，而且内容一改误差又变。收益抵不过代价。 */
+.sec { padding: 100px 0 0; scroll-margin-top: 100px; }
+.sec-head { margin-bottom: 36px; }
+.sec-head h2 { font-size: clamp(28px, 3.8vw, 46px); margin-top: 12px; }
+.sec-head p { margin-top: 14px; color: var(--ink-2); max-width: 62ch; font-size: 15.5px; }
+
+/* ---------- 关于 ---------- */
+.about-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 20px; }
+.about-card { padding: 30px 30px 32px; border-radius: var(--r-xl); }
+.about-card h3 { font-size: 19px; margin-bottom: 18px; }
+.prose p { color: var(--ink-2); font-size: 15.5px; }
+.prose p + p { margin-top: 15px; }
+.facts { padding: 30px; border-radius: var(--r-xl); }
+.mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+.mini-card { padding: 26px 28px; border-radius: var(--r-lg); }
+.mini-card h3 { font-size: 16px; margin-bottom: 16px; }
+.campus-item { padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.075); }
+.campus-item:last-child { border-bottom: 0; }
+.campus-org { font-size: 14.5px; font-weight: 600; }
+.campus-period { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+.campus-txt { font-size: 13.5px; color: var(--ink-3); margin-top: 7px; line-height: 1.7; }
+.cert-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* ---------- 技能 ---------- */
+.skill-bento { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; }
+.skill-card { padding: 24px; border-radius: var(--r-lg); display: flex; flex-direction: column; }
+.skill-card.span3 { grid-column: span 3; }
+.skill-card.span2 { grid-column: span 2; }
+.skill-hd { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+.skill-ico {
+  width: 34px; height: 34px; border-radius: 11px; flex: none; display: grid; place-items: center;
+  background: linear-gradient(150deg, rgba(255,255,255,.16), rgba(255,255,255,.05));
+  border: 1px solid rgba(255,255,255,.13);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28);
+}
+.skill-ico svg { width: 17px; height: 17px; color: #DCD6FF; }
+.skill-name { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+.tier { display: flex; gap: 10px; align-items: flex-start; }
+.tier + .tier { margin-top: 11px; }
+.tier-k { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; color: var(--ink-3); flex: none; padding-top: 5px; width: 30px; }
+.tier-k.k-now { color: #A5B4FC; }
+.tags { display: flex; flex-wrap: wrap; gap: 7px; }
+
+/* ---------- 经历 ---------- */
+.job { padding: 28px 30px; border-radius: var(--r-xl); }
+.job + .job { margin-top: 20px; }
+.job-hd { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,.09); }
+.job-co { font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
+.job-role { font-size: 13px; color: #C4B5FD; font-weight: 500; }
+.job-period { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+.job-points { padding-top: 20px; }
+.job-points li { position: relative; padding-left: 24px; font-size: 14.7px; color: var(--ink-2); line-height: 1.78; }
+.job-points li + li { margin-top: 12px; }
+.job-points li::before {
+  content: ""; position: absolute; left: 0; top: 10px; width: 9px; height: 9px; border-radius: 3px;
+  background: linear-gradient(135deg, var(--indigo), var(--violet));
+  box-shadow: 0 0 10px rgba(124,58,237,.7);
+}
+.metric { color: #fff; font-weight: 600; padding: 1px 7px; border-radius: 7px; background: rgba(99,102,241,.3); border: 1px solid rgba(165,180,252,.35); }
+.job-stack { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.09); }
+
+/* ---------- 项目 ---------- */
+.proj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+/* 项目卡缩略图：项目真实界面截图，固定 16:9 比例避免加载时高度跳动 */
+.pcard-thumb {
+  position: relative; flex: none; aspect-ratio: 16 / 9; overflow: hidden;
+  background: #0B0D16; border-bottom: 1px solid rgba(255,255,255,.09);
+}
+.pcard-thumb img {
+  display: block; width: 100%; height: 100%; object-fit: cover; object-position: center;
+  transition: transform .6s cubic-bezier(.4,0,.2,1);
+}
+@media (hover: hover) {
+  .pcard:hover .pcard-thumb img { transform: scale(1.03); }
+}
+/* 顶部一道玻璃折射高光，与站内其它 glass 卡保持一致 */
+.pcard-thumb::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0) 24%);
+  mix-blend-mode: screen;
+}
+/* 底部向卡身渐隐，避免亮色截图在暗色卡上形成生硬切边 */
+.pcard-thumb::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(5,6,11,0) 46%, rgba(5,6,11,.22) 76%, rgba(5,6,11,.58) 100%);
+}
+
+.pcard {
+  position: relative; display: flex; flex-direction: column;
+  border-radius: var(--r-xl); padding: 0; overflow: hidden;
+  transition: transform .3s cubic-bezier(.4,0,.2,1), box-shadow .3s ease, border-color .3s ease;
+}
+.pcard:hover { transform: translateY(-6px); border-color: rgba(255,255,255,.24); box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 36px 70px -26px rgba(0,0,0,.85); }
+.pcard-link { position: absolute; inset: 0; z-index: 1; }
+.pcard-hd { padding: 22px 24px 0; }
+.pcard-hd h3 { font-size: 19px; letter-spacing: -.025em; }
+.pcard-meta { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.pcard-body { padding: 18px 24px 0; flex: 1; }
+.pcard-desc { font-size: 14.4px; color: var(--ink-2); }
+.pcard-points { margin-top: 16px; }
+.pcard-points li { position: relative; padding-left: 18px; font-size: 13.3px; color: var(--ink-3); line-height: 1.7; }
+.pcard-points li + li { margin-top: 9px; }
+.pcard-points li::before { content: ""; position: absolute; left: 2px; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--cyan); opacity: .8; }
+.pcard-tech { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; }
+.pcard-foot { position: relative; z-index: 2; padding: 20px 24px 24px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ---------- 联系 ---------- */
+.contact { padding: 44px; border-radius: var(--r-xl); display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; align-items: center; }
+.contact h2 { font-size: clamp(28px, 3.8vw, 46px); }
+.contact p { margin-top: 16px; color: var(--ink-2); font-size: 15.5px; }
+.clinks { display: grid; gap: 12px; }
+.clink {
+  display: flex; align-items: center; gap: 14px; padding: 15px 18px; border-radius: var(--r-md);
+  background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.1);
+  transition: background .22s ease, transform .22s ease, border-color .22s ease;
+}
+.clink:hover { background: rgba(255,255,255,.11); border-color: rgba(255,255,255,.2); transform: translateX(4px); }
+.clink-ico { width: 38px; height: 38px; border-radius: 12px; flex: none; display: grid; place-items: center;
+  background: linear-gradient(150deg, rgba(255,255,255,.16), rgba(255,255,255,.04)); border: 1px solid rgba(255,255,255,.12); }
+.clink-ico svg { width: 18px; height: 18px; color: #C7D2FE; }
+.clink-label { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); font-family: var(--mono); }
+.clink-value { font-size: 14.5px; font-weight: 500; word-break: break-all; }
+.clink-arrow { margin-left: auto; color: var(--ink-3); }
+
+/* ---------- 页脚 ---------- */
+.foot { margin-top: 100px; border-top: 1px solid rgba(255,255,255,.08); }
+.foot-in { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; padding: 30px 0 40px; font-size: 13.5px; color: var(--ink-3); }
+.foot-links { display: flex; gap: 10px; margin-left: auto; }
+.foot-links a {
+  width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.11);
+  transition: background .22s ease, transform .22s ease;
+}
+.foot-links a:hover { background: rgba(255,255,255,.14); transform: translateY(-2px); }
+.foot-links svg { width: 17px; height: 17px; }
+
+.to-top {
+  position: fixed; right: 24px; bottom: 24px; z-index: 70;
+  width: 48px; height: 48px; border-radius: 50%; cursor: pointer;
+  display: grid; place-items: center; color: #fff;
+  background: rgba(20,22,34,.6); border: 1px solid rgba(255,255,255,.16);
+  backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 14px 30px -14px rgba(0,0,0,.9);
+  opacity: 0; pointer-events: none; transition: opacity .3s ease, transform .3s ease;
+}
+.to-top.show { opacity: 1; pointer-events: auto; }
+.to-top:hover { transform: translateY(-3px); }
+.to-top svg { width: 19px; height: 19px; }
+
+/* ---------- 移动端汉堡菜单 ---------- */
+.island-wrap { flex-direction: column; align-items: center; }
+.island-burger {
+  display: none; position: relative; width: 38px; height: 38px; margin-left: 4px; flex: none;
+  border-radius: 999px; cursor: pointer; padding: 0;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14);
+  color: #fff;
+  transition: background .22s ease;
+}
+.island-burger:hover { background: rgba(255,255,255,.16); }
+/* 三条线统一绝对定位到按钮中心，再用 translate 上下错开，展开时回到中心旋转成 X */
+.island-burger span {
+  position: absolute; left: 50%; top: 50%;
+  width: 16px; height: 1.6px; border-radius: 2px;
+  background: currentColor; margin: 0;
+  transform: translate(-50%, -50%);
+  transition: transform .28s cubic-bezier(.4,0,.2,1), opacity .18s ease;
+}
+.island-burger span:nth-child(1) { transform: translate(-50%, calc(-50% - 5px)); }
+.island-burger span:nth-child(3) { transform: translate(-50%, calc(-50% + 5px)); }
+.island-burger[aria-expanded="true"] span:nth-child(1) { transform: translate(-50%, -50%) rotate(45deg); }
+.island-burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.island-burger[aria-expanded="true"] span:nth-child(3) { transform: translate(-50%, -50%) rotate(-45deg); }
+
+.menu-sheet {
+  pointer-events: auto; display: none; margin-top: 10px; width: min(330px, 100%);
+  border-radius: 24px; overflow: hidden;
+  background: rgba(18,20,30,.93);
+  backdrop-filter: blur(34px) saturate(190%);
+  -webkit-backdrop-filter: blur(34px) saturate(190%);
+  border: 1px solid rgba(255,255,255,.13);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 30px 60px -22px rgba(0,0,0,.9);
+}
+.menu-sheet[data-open="true"] { display: block; animation: sheetIn .26s cubic-bezier(.4,0,.2,1); }
+@keyframes sheetIn { from { opacity: 0; transform: translateY(-8px) scale(.98); } }
+.menu-sheet a {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 15px 20px; font-size: 15px; font-weight: 500; color: var(--ink-2);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.menu-sheet a:last-child { border-bottom: 0; }
+.menu-sheet a:hover, .menu-sheet a:focus-visible { background: rgba(255,255,255,.09); color: #fff; }
+.menu-sheet a[aria-current="true"] { background: rgba(99,102,241,.24); color: #fff; }
+.menu-sheet a .mono { font-size: 10.5px; letter-spacing: .14em; color: var(--ink-3); }
+
+/* ---------- 降级兜底：不支持背景模糊的浏览器改用实体深色玻璃 ---------- */
+@supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
+  .glass { background: rgba(22,24,36,.94); }
+  .glass::before { display: none; }
+  .island { background: rgba(18,20,30,.97); }
+  .menu-sheet { background: #12141E; }
+  .btn-glass { background: rgba(255,255,255,.1); }
+  .to-top { background: rgba(18,20,30,.95); }
+}
+
+/* 键盘聚焦到卡片内部时同样亮起镜面高光 */
+.spec:focus-within::after { opacity: 1; }
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 1080px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 36px; }
+  .profile { max-width: 460px; }
+  .stats { grid-template-columns: 1fr 1fr; margin-top: 64px; }
+  .about-grid, .mini-grid, .contact { grid-template-columns: 1fr; }
+  .skill-bento { grid-template-columns: repeat(2, 1fr); }
+  .skill-card.span3, .skill-card.span2 { grid-column: span 2; }
+  .proj-grid { grid-template-columns: 1fr 1fr; }
+  .island .links { display: none; }
+  .island-burger { display: grid; }
+}
+@media (max-width: 760px) {
+  /* 移动端 GPU 弱：5 个 96px 高斯模糊层常驻动画会长期占用合成资源，
+     降为 3 个、缩小模糊半径，并撤掉 will-change（无需提前提升图层）。
+     注意 animation 必须连同 .b1/.b2/.b4 一起写：媒体查询不提升选择器优先级，
+     只写 .blob 会被前面的 .blob.b1 压过去。 */
+  .blob { filter: blur(70px); will-change: auto; }
+  .blob.b1, .blob.b2, .blob.b3, .blob.b4, .blob.b5 { animation: none; }
+  .blob.b3, .blob.b5 { display: none; }
+  /* 玻璃模糊半径下调，每帧需要采样的区域随之减小 */
+  .glass {
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+  }
+  /* 噪点层固定覆盖全屏，移动端降低不透明度即可，省一次合成 */
+  .grain { opacity: .11; }
+
+  .hero { padding-top: 118px; }
+  .sec { padding-top: 74px; scroll-margin-top: 84px; }
+  .stats { grid-template-columns: 1fr; }
+  .skill-bento, .proj-grid { grid-template-columns: 1fr; }
+  .skill-card.span3, .skill-card.span2 { grid-column: span 1; }
+  .contact { padding: 30px 24px; }
+  .job, .about-card, .facts, .mini-card { padding: 24px 22px; }
+  .wrap { width: min(1200px, 100% - 28px); }
+  .island .brand-name { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .blob, .dot-live { animation: none; }
+  .menu-sheet[data-open="true"] { animation: none; }
+  .spec::after { transition: none; opacity: 0; }
+  * { transition-duration: .01s !important; }
+}
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "蔡昕辰",
+  "alternateName": "Cai Xinchen",
+  "jobTitle": "AI 应用开发工程师",
+  "email": "mailto:leocai040727@gmail.com",
+  "telephone": "19822663760",
+  "alumniOf": { "@type": "CollegeOrUniversity", "name": "南京工业大学浦江学院" },
+  "knowsAbout": ["LangGraph", "LangChain", "FastAPI", "多 Agent 系统", "RAG", "Docker", "Python", "Vue 3"],
+  "sameAs": ["https://github.com/Drgonmancer"]
+}
+</script>
+</head>
+<body>
+
+<!-- ---------- 背景 ---------- -->
+<div class="aurora" aria-hidden="true">
+  <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="blob b4"></span><span class="blob b5"></span>
+</div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ---------- 动态岛导航 ---------- -->
+<header class="island-wrap">
+  <nav class="island" id="island" aria-label="主导航">
+    <a class="brand" href="#top" aria-label="返回页面顶部">
+      <span class="avatar-mini" id="avatarMini"><img src="avatar.jpg" alt="蔡昕辰的头像" onerror="this.parentNode.textContent='蔡'"></span>
+      <span class="brand-name">蔡昕辰</span>
+    </a>
+    <span class="links" id="islandLinks">
+      <a href="#about">关于</a>
+      <a href="#skills">技能</a>
+      <a href="#work">经历</a>
+      <a href="#projects">项目</a>
+      <a href="#contact">联系</a>
+    </span>
+    <a class="cta" id="islandCta" href="mailto:leocai040727@gmail.com">写邮件</a>
+    <button class="island-burger" id="islandBurger" type="button"
+            aria-label="打开导航菜单" aria-expanded="false" aria-controls="islandMenu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <nav class="menu-sheet" id="islandMenu" data-open="false" aria-label="移动端导航">
+    <a href="#about">关于我<i class="mono">01</i></a>
+    <a href="#skills">技术栈<i class="mono">02</i></a>
+    <a href="#work">工作经历<i class="mono">03</i></a>
+    <a href="#projects">我的项目<i class="mono">04</i></a>
+    <a href="#contact">联系我<i class="mono">05</i></a>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- ================= Hero ================= -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="pill"><i class="dot-live" aria-hidden="true"></i>2026 届应届 · 正在看机会</span>
+        <h1><span class="grad-text">AI 应用开发<br>工程师</span></h1>
+        <p class="hero-role">
+          我是<b>蔡昕辰</b> · LangGraph 多 Agent 编排 / FastAPI 异步后端 / 企业级容器化部署
+        </p>
+        <p class="hero-desc">
+          软件工程本科，方向是 AI 应用落地。擅长把大模型能力拆成可编排、可恢复、可观测的工程系统，
+          再用 FastAPI 做成能上线的服务。独立完成 3 个从 0 到 1 的多 Agent 全栈项目，
+          也在政务医保平台处理过 120 万+ 条历史数据的清洗与部署联调。
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#projects">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+            查看项目
+          </a>
+          <a class="btn btn-glass" id="heroMail" href="mailto:leocai040727@gmail.com">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.6" y="4.6" width="18.8" height="14.8" rx="3"></rect><path d="M3.4 7.4l8.6 5.6 8.6-5.6"></path></svg>
+            联系我
+          </a>
+        </div>
+        <div class="hero-meta" id="heroMeta"><span class="pill">江苏南京 / 浙江杭州</span><span class="pill">2026 届 · 本科</span><span class="pill">9 个公开仓库</span><span class="pill">CET-6</span></div>
+      </div>
+
+      <aside class="glass spec profile">
+        <div class="profile-top">
+          <div class="profile-img" id="profileImg">
+            <img src="avatar.jpg" alt="蔡昕辰的证件照" width="480" height="480" decoding="async"
+                 onerror="this.parentNode.textContent='蔡'">
+          </div>
+          <div>
+            <p class="profile-name">蔡昕辰</p>
+            <p class="profile-sub">Cai Xinchen · 南京工业大学浦江学院</p>
+            <p class="profile-sub" style="margin-top:8px"><span class="pill" style="font-size:11.5px;padding:4px 10px">软件工程 · 本科</span></p>
+          </div>
+        </div>
+        <dl class="profile-rows" id="profileRows"><div><dt>求职方向</dt><dd>AI 应用 / 后端开发</dd></div><div><dt>期望城市</dt><dd>杭州 · 南京</dd></div><div><dt>学历</dt><dd>本科 · 2026.06 毕业</dd></div><div><dt>英语</dt><dd>CET-4 / CET-6</dd></div></dl>
+      </aside>
+    </div>
+
+    <div class="wrap">
+      <div class="stats" id="statsBox"><div class="glass spec stat"><p class="stat-num grad-text">120万+</p><p class="stat-label">条历史数据清洗与批量导入</p></div><div class="glass spec stat"><p class="stat-num grad-text">9 个</p><p class="stat-label">独立开发的公开仓库</p></div><div class="glass spec stat"><p class="stat-num grad-text">59 个</p><p class="stat-label">自动化测试覆盖容错与幂等</p></div><div class="glass spec stat"><p class="stat-num grad-text">80%+</p><p class="stat-label">短剧生产链路人工干预减少</p></div></div>
+    </div>
+  </section>
+
+  <!-- ================= 01 关于 ================= -->
+  <section class="sec" id="about" aria-labelledby="tAbout">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">01 — About</span>
+        <h2 id="tAbout">关于我</h2>
+        <p>把模型能力变成能跑在生产环境里的系统，而不是停留在 notebook 里的 demo。</p>
+      </div>
+
+      <div class="about-grid">
+        <div class="glass spec about-card">
+          <h3>自我描述</h3>
+          <div class="prose">
+            <p>
+              在杭州畅游未来做 AI 落地工程，独立负责过批量出图智能体、氛围图生成平台、
+              主图 CTR 诊断模块，以及 AI 短剧自动化生产平台的架构设计；
+              在国新健康参与江西省医保局信息平台建设，负责数据治理与多数据库环境部署。
+            </p>
+            <p>
+              习惯先调研竞品再设计需求，也习惯读源码解决框架自身的局限。写代码时在意两件事：
+              出问题能不能查得到、量上来会不会拖垮。
+            </p>
+          </div>
+        </div>
+        <div class="glass spec facts">
+          <h3 style="font-size:19px;margin:0 0 12px">基本信息</h3>
+          <dl class="profile-rows" id="factRows" style="margin-top:8px;border-top:0"><div><dt>院校</dt><dd>南京工业大学浦江学院</dd></div><div><dt>专业</dt><dd>软件工程（本科）</dd></div><div><dt>在读时间</dt><dd>2022.09 — 2026.06</dd></div><div><dt>核心课程</dt><dd>Java / Python / 数据结构 / 操作系统 / 计算机网络 / Web 开发 / 软件测试 / 云计算</dd></div><div><dt>代码托管</dt><dd><a href="https://github.com/Drgonmancer" target="_blank" rel="noopener noreferrer" style="color:#C4B5FD">@Drgonmancer ↗</a></dd></div></dl>
+        </div>
+      </div>
+
+      <div class="mini-grid">
+        <div class="glass spec mini-card">
+          <h3>校园经历</h3>
+          <div id="campusBox"><div class="campus-item"><div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline"><span class="campus-org">英语语言与文化协会 · 活动部部长</span><span class="campus-period">2023.03 — 2023.12</span></div><p class="campus-txt">统筹校内英语活动执行与物资采购；协助英语教学部完成空中英语课堂考题编辑及期末试卷批改。</p></div><div class="campus-item"><div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline"><span class="campus-org">校武术队 · 队长</span><span class="campus-period">2023.06 — 2024.12</span></div><p class="campus-txt">统筹校内大型体育活动，负责经费申请与策划书撰写，成功举办武术比赛与文化节；主导与南京石湫政府合作的武术传统文化巡演项目。</p></div></div>
+        </div>
+        <div class="glass spec mini-card">
+          <h3>证书</h3>
+          <div class="cert-wrap" id="certBox"><span class="tag">计算机三级 · 网络技术</span><span class="tag">计算机四级 · 网络工程师</span><span class="tag">CET-4 大学英语四级</span><span class="tag">CET-6 大学英语六级</span><span class="tag">普通话二级甲等</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 02 技能 ================= -->
+  <section class="sec" id="skills" aria-labelledby="tSkills">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">02 — Stack</span>
+        <h2 id="tSkills">技术栈与能力矩阵</h2>
+        <p>分「熟悉」与「了解」两档。熟悉 = 独立写过完整项目并踩过坑；了解 = 能上手改，但不敢说精通。</p>
+      </div>
+      <div class="skill-bento" id="skillBox"><article class="glass spec skill-card span3"><div class="skill-hd"><span class="skill-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.2 13.9 9l5.8 1.9-5.8 1.9L12 18.6l-1.9-5.8L4.3 10.9 10.1 9z"></path></svg></span><h3 class="skill-name">AI 应用开发</h3></div><div class="tier"><span class="tier-k k-now">熟悉</span><div class="tags"><span class="tag tag-accent">LangChain</span><span class="tag tag-accent">LangGraph</span><span class="tag tag-accent">MCP</span><span class="tag tag-accent">RAG</span><span class="tag tag-accent">Embedding</span><span class="tag tag-accent">Prompt 工程</span><span class="tag tag-accent">Function Calling</span></div></div><div class="tier"><span class="tier-k">了解</span><div class="tags"><span class="tag tag-dim">A2A</span></div></div></article><article class="glass spec skill-card span3"><div class="skill-hd"><span class="skill-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="7" rx="1.6"></rect><rect x="3" y="13" width="18" height="7" rx="1.6"></rect><path d="M7 7.5h.01M7 16.5h.01"></path></svg></span><h3 class="skill-name">后端开发</h3></div><div class="tier"><span class="tier-k k-now">熟悉</span><div class="tags"><span class="tag tag-accent">Python</span><span class="tag tag-accent">Django</span><span class="tag tag-accent">FastAPI</span></div></div><div class="tier"><span class="tier-k">了解</span><div class="tags"><span class="tag tag-dim">Flask</span><span class="tag tag-dim">Java</span><span class="tag tag-dim">Node.js</span></div></div></article><article class="glass spec skill-card span2"><div class="skill-hd"><span class="skill-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3.2"></ellipse><path d="M4 6v12c0 1.8 3.6 3.2 8 3.2s8-1.4 8-3.2V6"></path><path d="M4 12c0 1.8 3.6 3.2 8 3.2s8-1.4 8-3.2"></path></svg></span><h3 class="skill-name">数据存储</h3></div><div class="tier"><span class="tier-k k-now">熟悉</span><div class="tags"><span class="tag tag-accent">MySQL</span><span class="tag tag-accent">SQLite</span><span class="tag tag-accent">PostgreSQL</span></div></div><div class="tier"><span class="tier-k">了解</span><div class="tags"><span class="tag tag-dim">MongoDB</span><span class="tag tag-dim">Oracle</span><span class="tag tag-dim">ClickHouse</span></div></div></article><article class="glass spec skill-card span2"><div class="skill-hd"><span class="skill-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 7.8l9 4.8 9-4.8z"></path><path d="M3 12.4l9 4.8 9-4.8"></path></svg></span><h3 class="skill-name">中间件</h3></div><div class="tier"><span class="tier-k k-now">熟悉</span><div class="tags"><span class="tag tag-accent">Redis</span><span class="tag tag-accent">Celery</span><span class="tag tag-accent">RabbitMQ</span></div></div><div class="tier"><span class="tier-k">了解</span><div class="tags"><span class="tag tag-dim">Redis Pub/Sub</span></div></div></article><article class="glass spec skill-card span2"><div class="skill-hd"><span class="skill-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 15.5 12 12l9 3.5-4 5.5H7z"></path><path d="M12 12V3.5l5 3v6"></path></svg></span><h3 class="skill-name">部署与工程化</h3></div><div class="tier"><span class="tier-k k-now">熟悉</span><div class="tags"><span class="tag tag-accent">Linux</span><span class="tag tag-accent">Docker</span><span class="tag tag-accent">Nginx</span></div></div><div class="tier"><span class="tier-k">了解</span><div class="tags"><span class="tag tag-dim">AWS EC2 / S3</span><span class="tag tag-dim">阿里云 ECS</span></div></div></article><article class="glass spec skill-card span3"><div class="skill-hd"><span class="skill-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2.6"></rect><path d="M3 9h18M9 21V9"></path></svg></span><h3 class="skill-name">前端能力</h3></div><div class="tier"><span class="tier-k k-now">熟悉</span><div class="tags"><span class="tag tag-accent">Vue 3</span><span class="tag tag-accent">TypeScript</span><span class="tag tag-accent">React 18</span><span class="tag tag-accent">Vite</span></div></div><div class="tier"><span class="tier-k">了解</span><div class="tags"><span class="tag tag-dim">Next.js</span><span class="tag tag-dim">Taro 4</span><span class="tag tag-dim">微信小程序</span></div></div></article><article class="glass spec skill-card span3"><div class="skill-hd"><span class="skill-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8l4 4-4 4"></path><path d="M12.5 16H19"></path><rect x="2" y="3.5" width="20" height="17" rx="2.6"></rect></svg></span><h3 class="skill-name">AI 编程工具</h3></div><div class="tier"><span class="tier-k k-now">熟悉</span><div class="tags"><span class="tag tag-accent">Claude Code</span><span class="tag tag-accent">Cursor</span><span class="tag tag-accent">Codex</span><span class="tag tag-accent">Trae</span><span class="tag tag-accent">WorkBuddy</span><span class="tag tag-accent">Ollama</span></div></div><div class="tier"><span class="tier-k">了解</span><div class="tags"><span class="tag tag-dim">Open Code</span><span class="tag tag-dim">Open Claw</span><span class="tag tag-dim">Hermes</span></div></div></article></div>
+    </div>
+  </section>
+
+  <!-- ================= 03 经历 ================= -->
+  <section class="sec" id="work" aria-labelledby="tWork">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">03 — Experience</span>
+        <h2 id="tWork">工作经历</h2>
+        <p>两段经历：一段在企业里做 AI 工具平台落地，一段在政务医保平台做数据治理与部署实施。</p>
+      </div>
+      <div id="jobBox"><article class="glass spec job"><div class="job-hd"><span class="job-co">杭州畅游未来科技有限公司</span><span class="job-role">AI 落地工程师</span><span class="job-period">2026.06 — 2026.07 · 在职</span></div><ul class="job-points"><li><span>负责电商 AI 工具平台核心业务开发，用 Flask + Gunicorn + Gevent 搭建高并发异步后端，整合 GPT、Claude、Gemini 等多家 AI 服务商，构建从选品策划、图片生成到视频制作的全链路内容生产系统。</span></li><li><span>开发批量出图智能体（Node.js + GPT-4o + GPT-Image-2）：设计「导演-作画」两段式流水线，单张生成从 6 分钟降至 2-3 分钟 <span class="metric">效率提升 2-3 倍</span>，支持并发 4 路与 128MB 批量上传处理。</span></li><li><span>开发场景复刻工具 · 氛围图生成平台（Next.js 16 + React 19 + Claude Opus）：实现爆款主图氛围维度提炼与白底产品图氛围迁移，支持 1-10 张批量参考图分析，<span class="metric">用户满意度提升 35%</span>。</span></li><li><span>主导主图 CTR 诊断模块（FastAPI + Pydantic v2 + 多模态 LLM + Docker/Vercel）：采用「评估同步 + 生图异步」轮询混合架构，抽象依赖 Protocol 层解耦业务与站点，完成双计费点幂等扣分，<span class="metric">59 个自动化测试</span>覆盖容错与计费幂等。</span></li><li><span>主导 AI 短剧自动化生产平台架构设计（Nuxt 3 + Hono + Mastra AI）：开发剧本改写、角色提取、分镜拆解、音色分配、提示词生成共 5 个专用 Agent，集成 6 家图片 / 4 家视频 / 1 家 TTS 服务商，<span class="metric">人工干预减少 80%+</span>，单集制作从 2-3 天降至 2-3 小时。</span></li></ul><div class="job-stack"><span class="tag">Python</span><span class="tag">Flask</span><span class="tag">FastAPI</span><span class="tag">LangChain</span><span class="tag">TypeScript</span><span class="tag">Node.js</span><span class="tag">Vue 3</span><span class="tag">Next.js</span><span class="tag">Git</span></div></article><article class="glass spec job"><div class="job-hd"><span class="job-co">国新健康保障服务有限公司</span><span class="job-role">技术实施（实习生）</span><span class="job-period">2025.08 — 2026.02</span></div><ul class="job-points"><li><span>在江西省医保局信息平台建设场景下，负责九江市两定资源、九江市信用评价与诊间审核相关的数据处理，以及宜春市奉新人民医院的系统部署与测试联调工作。</span></li><li><span>编写 Python 数据清洗与转换脚本，完成 <span class="metric">120 万+ 条</span>历史数据标准化处理与批量导入，数据准确率稳定在 <span class="metric">90%+</span>。</span></li><li><span>独立完成 Linux 环境部署：安装配置 MySQL / MongoDB / ClickHouse、多微服务引擎（8086-8088）、防火墙策略与 NTP 同步，打通从环境搭建到应用启动的全流程。</span></li><li><span>协助完成信用评价子系统测试联调，覆盖信用采集、信用评定、红黑白灰名单、统计分析等 10+ 核心模块；完成 5 个核心接口联调，定位并推动修复 7 个字段格式与交互异常问题。</span></li></ul><div class="job-stack"><span class="tag">Python</span><span class="tag">Java</span><span class="tag">Linux</span><span class="tag">MySQL</span><span class="tag">Oracle</span><span class="tag">MongoDB</span><span class="tag">ClickHouse</span><span class="tag">Docker</span><span class="tag">Nginx</span><span class="tag">OpenAPI</span></div></article></div>
+    </div>
+  </section>
+
+  <!-- ================= 04 项目 ================= -->
+  <section class="sec" id="projects" aria-labelledby="tProj">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">04 — Selected Works</span>
+        <h2 id="tProj">我的项目</h2>
+        <p>共 <b>9 个公开仓库</b>，按负责程度与时间排列。点击卡片任意位置，或点卡片底部的 GitHub 按钮，都会在新标签页打开对应仓库。</p>
+      </div>
+      <div class="proj-grid" id="projBox"><article class="glass spec pcard"><a class="pcard-link" href="https://github.com/Drgonmancer/ai-quest-learning-mini-program" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「AI 闯关学习小程序」的 GitHub 仓库"></a><div class="pcard-thumb"><img src="assets/proj-quest.webp" alt="AI 闯关学习小程序界面：答题选项正误高亮与解析、通关报告掌握度评分、知识库文档已就绪" width="1280" height="720" loading="lazy" decoding="async"></div><div class="pcard-hd"><h3>AI 闯关学习小程序</h3><div class="pcard-meta"><span class="tag tag-accent">负责人</span><span class="tag">2026.07 — 2026.08</span></div></div><div class="pcard-body"><p class="pcard-desc">基于 ReAct 智能体 + RAG 知识库的闯关式学习小程序，支持联网检索出题、结构化判分与 AI 自动配图。</p><ul class="pcard-points"><li><span>基于 LangGraph 构建 ReAct 出题智能体，接入 Tavily 联网搜索，由模型自主决定检索关键词与轮次，解决大模型知识截止导致的题目过时问题。</span></li><li><span>用 LangChain 将模型输出稳定约束为结构化 JSON（单选 / 多选 / 判断三类题型），保证前端渲染与判分逻辑可靠。</span></li><li><span>设计异步出题任务架构：POST 提交 + GET 轮询，配合 asyncio 并发与超时管理，避免长耗时 LLM 调用阻塞请求链路。</span></li><li><span>从 0 实现 RAG 知识库：PDF / Word / Markdown 解析 → 分块 → 百炼 text-embedding-v4 向量化存入 Chroma → Top-K 4 检索增强。</span></li></ul><div class="pcard-tech"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">LangGraph</span><span class="tag">DeepSeek</span><span class="tag">Tavily</span><span class="tag">Chroma</span><span class="tag">Taro 4</span><span class="tag">Docker</span></div></div><div class="pcard-foot"><a class="btn btn-glass btn-sm" href="https://github.com/Drgonmancer/ai-quest-learning-mini-program" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「AI 闯关学习小程序」的 GitHub 仓库"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 19c-4.5 1.4-4.5-2.2-6-2.8m12 5v-3.6a3 3 0 0 0-.8-2.3c2.7-.3 5.5-1.3 5.5-6a4.7 4.7 0 0 0-1.3-3.2 4.4 4.4 0 0 0-.1-3.3s-1-.3-3.4 1.3a11.6 11.6 0 0 0-6.1 0C6.2 3.7 5.2 4 5.2 4a4.4 4.4 0 0 0-.1 3.3A4.7 4.7 0 0 0 3.8 10.5c0 4.6 2.8 5.6 5.5 6a3 3 0 0 0-.8 2.3V22"></path></svg> GitHub 仓库</a></div></article><article class="glass spec pcard"><a class="pcard-link" href="https://github.com/Drgonmancer/job-match-workflow" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「多 Agent 求职辅助系统」的 GitHub 仓库"></a><div class="pcard-thumb"><img src="assets/proj-jobmatch.webp" alt="多 Agent 求职辅助系统工作台界面：求职目标输入、运行分析表单与会话摘要统计面板" width="1280" height="720" loading="lazy" decoding="async"></div><div class="pcard-hd"><h3>多 Agent 求职辅助系统</h3><div class="pcard-meta"><span class="tag tag-accent">负责人</span><span class="tag">2026.06 — 2026.07</span></div></div><div class="pcard-body"><p class="pcard-desc">围绕「岗位分析 → 简历匹配 → 低分优化 → 求职建议」真实链路的多 Agent 可恢复状态图系统。</p><ul class="pcard-points"><li><span>基于开源多 Agent 方案落地可恢复状态图系统，完成前后端联调与容器化启动。</span></li><li><span>采用 Supervisor 与岗位分析、简历评审、简历优化、职业教练四角色协作；LangGraph 的 Send 并行、子图与低分回路实现可回路优化。</span></li><li><span>基于 SQLite Checkpoint 管理 thread_id 会话状态，支持中断恢复与历史快照读取。</span></li><li><span>使用 FastAPI 提供认证、会话管理、简历上传（txt / md / pdf）与图执行接口，Vue 前端完成分析空间与结果展示。</span></li></ul><div class="pcard-tech"><span class="tag">Python</span><span class="tag">LangGraph</span><span class="tag">FastAPI</span><span class="tag">Vue 3</span><span class="tag">SQLite Checkpoint</span><span class="tag">Docker Compose</span></div></div><div class="pcard-foot"><a class="btn btn-glass btn-sm" href="https://github.com/Drgonmancer/job-match-workflow" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「多 Agent 求职辅助系统」的 GitHub 仓库"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 19c-4.5 1.4-4.5-2.2-6-2.8m12 5v-3.6a3 3 0 0 0-.8-2.3c2.7-.3 5.5-1.3 5.5-6a4.7 4.7 0 0 0-1.3-3.2 4.4 4.4 0 0 0-.1-3.3s-1-.3-3.4 1.3a11.6 11.6 0 0 0-6.1 0C6.2 3.7 5.2 4 5.2 4a4.4 4.4 0 0 0-.1 3.3A4.7 4.7 0 0 0 3.8 10.5c0 4.6 2.8 5.6 5.5 6a3 3 0 0 0-.8 2.3V22"></path></svg> GitHub 仓库</a></div></article><article class="glass spec pcard"><a class="pcard-link" href="https://github.com/Drgonmancer/AI-Image-Text-Studio" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「AI 智能图文创作器」的 GitHub 仓库"></a><div class="pcard-thumb"><img src="assets/proj-studio.webp" alt="AI 智能图文创作器创作页界面：智能体流程时间轴、选题输入与场景选择、创作配额面板" width="1280" height="720" loading="lazy" decoding="async"></div><div class="pcard-hd"><h3>AI 智能图文创作器</h3><div class="pcard-meta"><span class="tag tag-accent">负责人</span><span class="tag">2026.05 — 2026.06</span></div></div><div class="pcard-body"><p class="pcard-desc">7 Agent 三阶段编排的图文创作平台，支持人机协作断点、SSE 实时进度推送与一键容器化部署。</p><ul class="pcard-points"><li><span>基于 LangGraph 设计 7 Agent 三阶段编排流水线（选题 / 标题 / 大纲 / 正文 / 配图 / 评审），通过 SceneRegistry 为 3 场景配置独立 Prompt 模板与 Graph 工厂。</span></li><li><span>实现三阶段人机协作（HITL）断点：标题生成后暂停待用户选择、大纲支持拖拽编辑与自然语言 AI 修改；基于 Redis Pub/Sub 驱动 SSE 实时进度推送。</span></li><li><span>搭建 FastAPI 后端，设计 22 个 REST / SSE 接口，落地 JWT 鉴权、每日配额与 Mock VIP 会员体系。</span></li><li><span>建设 Agent Trace 管理后台，双写 LangSmith 与本地日志，可视化 Token 消耗与耗时。</span></li></ul><div class="pcard-tech"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">LangGraph</span><span class="tag">Vue 3</span><span class="tag">Redis</span><span class="tag">SSE</span><span class="tag">DeepSeek</span><span class="tag">Docker</span></div></div><div class="pcard-foot"><a class="btn btn-glass btn-sm" href="https://github.com/Drgonmancer/AI-Image-Text-Studio" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「AI 智能图文创作器」的 GitHub 仓库"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 19c-4.5 1.4-4.5-2.2-6-2.8m12 5v-3.6a3 3 0 0 0-.8-2.3c2.7-.3 5.5-1.3 5.5-6a4.7 4.7 0 0 0-1.3-3.2 4.4 4.4 0 0 0-.1-3.3s-1-.3-3.4 1.3a11.6 11.6 0 0 0-6.1 0C6.2 3.7 5.2 4 5.2 4a4.4 4.4 0 0 0-.1 3.3A4.7 4.7 0 0 0 3.8 10.5c0 4.6 2.8 5.6 5.5 6a3 3 0 0 0-.8 2.3V22"></path></svg> GitHub 仓库</a></div></article><article class="glass spec pcard"><a class="pcard-link" href="https://github.com/Drgonmancer/customer-support-agent" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「生产级客服 Agent」的 GitHub 仓库"></a><div class="pcard-thumb"><img src="assets/proj-support.webp" alt="生产级客服 Agent 的终端实录：customer-support-agent eval 输出七项指标全部通过，GATE PASSED" width="1280" height="720" loading="lazy" decoding="async"></div><div class="pcard-hd"><h3>生产级客服 Agent</h3><div class="pcard-meta"><span class="tag tag-accent">负责人</span><span class="tag">2026.08</span></div></div><div class="pcard-body"><p class="pcard-desc">面向生产环境的客服工作流：Supervisor 调度专职子 Agent，大额退款必须人工审批，护栏与评估内嵌在链路里，全离线可跑。</p><ul class="pcard-points"><li><span>用 LangGraph 的 StateGraph 做 Supervisor 路由，把消息分派给专职子 Agent；路由是带类型、可单测的函数，而不是一条自由发挥的 Prompt。</span></li><li><span>金额相关操作全部落成有类型、有测试的 Python 工具，模型只负责意图分类与措辞，绝不做钱的算术。</span></li><li><span>中额退款在 &lt;span class="metric"&gt;interrupt()&lt;/span&gt; 上暂停等人工裁决，状态经 checkpointer 跨暂停保留；超过硬上限的退款在治理层被结构性拒绝。</span></li><li><span>guard_input / guard_output 逐轮包裹：入站脱敏 PII 并拦截提示注入，出站绝不回吐 PII；14 条标注场景的 eval 套件在 CI 上守门。</span></li></ul><div class="pcard-tech"><span class="tag">Python</span><span class="tag">LangGraph</span><span class="tag">Langfuse</span><span class="tag">Pydantic</span><span class="tag">MCP</span><span class="tag">BM25 RAG</span><span class="tag">pytest</span><span class="tag">Ruff</span></div></div><div class="pcard-foot"><a class="btn btn-glass btn-sm" href="https://github.com/Drgonmancer/customer-support-agent" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「生产级客服 Agent」的 GitHub 仓库"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 19c-4.5 1.4-4.5-2.2-6-2.8m12 5v-3.6a3 3 0 0 0-.8-2.3c2.7-.3 5.5-1.3 5.5-6a4.7 4.7 0 0 0-1.3-3.2 4.4 4.4 0 0 0-.1-3.3s-1-.3-3.4 1.3a11.6 11.6 0 0 0-6.1 0C6.2 3.7 5.2 4 5.2 4a4.4 4.4 0 0 0-.1 3.3A4.7 4.7 0 0 0 3.8 10.5c0 4.6 2.8 5.6 5.5 6a3 3 0 0 0-.8 2.3V22"></path></svg> GitHub 仓库</a></div></article><article class="glass spec pcard"><a class="pcard-link" href="https://github.com/Drgonmancer/rag-agent-workflow" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「Agentic RAG 系统」的 GitHub 仓库"></a><div class="pcard-thumb"><img src="assets/proj-rag.webp" alt="Agentic RAG 的 Gradio 对话界面：历史摘要、查询改写与检索父块的完整链路展示" width="1280" height="720" loading="lazy" decoding="async"></div><div class="pcard-hd"><h3>Agentic RAG 系统</h3><div class="pcard-meta"><span class="tag tag-accent">负责人</span><span class="tag">2026.08</span></div></div><div class="pcard-body"><p class="pcard-desc">端到端的 Agentic RAG：PDF 转 Markdown 后层次化分块、Qdrant 向量检索、Map-Reduce 并行子查询，并用 RAGAS 量化评测。</p><ul class="pcard-points"><li><span>层次索引：用小颗粒度子块保证检索精度，命中后回溯父块补足上下文，兼顾精度与信息完整度。</span></li><li><span>多智能体 Map-Reduce：把复杂问题拆成最多 3 条并行子查询，各自由独立子图完成「检索 → 自纠 → 收敛」。</span></li><li><span>会话滚动摘要 + 查询改写让多轮追问不断片；语义不清时在 interrupt 上暂停，先向用户澄清再检索。</span></li><li><span>工具调用预算与上下文压缩控制长链路开销；RAGAS 五项指标量化检索与回答质量，Langfuse 全链路可观测。</span></li></ul><div class="pcard-tech"><span class="tag">Python</span><span class="tag">LangGraph</span><span class="tag">Qdrant</span><span class="tag">Ollama</span><span class="tag">Gradio</span><span class="tag">RAGAS</span><span class="tag">Langfuse</span><span class="tag">Docker</span></div></div><div class="pcard-foot"><a class="btn btn-glass btn-sm" href="https://github.com/Drgonmancer/rag-agent-workflow" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「Agentic RAG 系统」的 GitHub 仓库"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 19c-4.5 1.4-4.5-2.2-6-2.8m12 5v-3.6a3 3 0 0 0-.8-2.3c2.7-.3 5.5-1.3 5.5-6a4.7 4.7 0 0 0-1.3-3.2 4.4 4.4 0 0 0-.1-3.3s-1-.3-3.4 1.3a11.6 11.6 0 0 0-6.1 0C6.2 3.7 5.2 4 5.2 4a4.4 4.4 0 0 0-.1 3.3A4.7 4.7 0 0 0 3.8 10.5c0 4.6 2.8 5.6 5.5 6a3 3 0 0 0-.8 2.3V22"></path></svg> GitHub 仓库</a></div></article><article class="glass spec pcard"><a class="pcard-link" href="https://github.com/Drgonmancer/AI-real-time-buzz-tracker" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「Pulse · AI 热点监控与决策助手」的 GitHub 仓库"></a><div class="pcard-thumb"><img src="assets/proj-buzz.webp" alt="Pulse 热点监控台界面：多平台热点列表、来源筛选、相关性评分与热度趋势迷你图" width="1280" height="720" loading="lazy" decoding="async"></div><div class="pcard-hd"><h3>Pulse · AI 热点监控与决策助手</h3><div class="pcard-meta"><span class="tag tag-accent">负责人</span><span class="tag">2026.05 — 2026.06</span></div></div><div class="pcard-body"><p class="pcard-desc">聚合 15+ 平台热点的实时监控台：定时采集、跨平台关键词搜索、勾选式 AI 分析，WebSocket 秒级推送到前端。</p><ul class="pcard-points"><li><span>自研采集服务统一 15+ 数据源（百度 / 微博 / B站 / GitHub / HN / Reddit / Google News 等）的字段口径，支持来源筛选与混合排序。</span></li><li><span>关键词跨平台并行搜索，结果自动去重入库，各平台成功与失败状态单独回传。</span></li><li><span>Socket.IO 推送新热点入库与 AI 分析完成事件，前端顶部 LIVE 指示灯与列表始终保持最新。</span></li><li><span>「先勾选、再分析」按需调用 DeepSeek，输出相关性评分、中文摘要与重要性判断；未配置 Key 时其余功能完全可用。</span></li></ul><div class="pcard-tech"><span class="tag">React 18</span><span class="tag">TypeScript</span><span class="tag">Express</span><span class="tag">Prisma</span><span class="tag">SQLite</span><span class="tag">Socket.IO</span><span class="tag">DeepSeek</span><span class="tag">Vite</span></div></div><div class="pcard-foot"><a class="btn btn-glass btn-sm" href="https://github.com/Drgonmancer/AI-real-time-buzz-tracker" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「Pulse · AI 热点监控与决策助手」的 GitHub 仓库"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 19c-4.5 1.4-4.5-2.2-6-2.8m12 5v-3.6a3 3 0 0 0-.8-2.3c2.7-.3 5.5-1.3 5.5-6a4.7 4.7 0 0 0-1.3-3.2 4.4 4.4 0 0 0-.1-3.3s-1-.3-3.4 1.3a11.6 11.6 0 0 0-6.1 0C6.2 3.7 5.2 4 5.2 4a4.4 4.4 0 0 0-.1 3.3A4.7 4.7 0 0 0 3.8 10.5c0 4.6 2.8 5.6 5.5 6a3 3 0 0 0-.8 2.3V22"></path></svg> GitHub 仓库</a></div></article><article class="glass spec pcard"><a class="pcard-link" href="https://github.com/Drgonmancer/FaceLens" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「FaceGuard · 人脸识别身份管理平台」的 GitHub 仓库"></a><div class="pcard-thumb"><img src="assets/proj-facelens.webp" alt="FaceGuard 管理后台界面：注册用户与登录统计卡片、近 7 日登录趋势折线图、登录方式分布环形图、最近登录记录" width="1280" height="720" loading="lazy" decoding="async"></div><div class="pcard-hd"><h3>FaceGuard · 人脸识别身份管理平台</h3><div class="pcard-meta"><span class="tag tag-accent">负责人</span><span class="tag">2026.05 — 2026.06</span></div></div><div class="pcard-body"><p class="pcard-desc">基于 OpenCV 与 Django 的 B/S 人脸识别身份管理平台：浏览器完成注册与人脸采集，支持刷脸或密码登录与陌生人告警。</p><ul class="pcard-points"><li><span>采用 Haar 检测 + LBPH 识别，纯 CPU 即可运行，无需 GPU，人脸数据全部本地存储、不出内网。</span></li><li><span>管理后台提供注册用户、今日登录、陌生人告警、识别成功率四项实时指标，以及近 7 日登录趋势与登录方式分布。</span></li><li><span>打通「注册 → 人脸采集 → 模型训练 → 刷脸 / 密码双通道登录 → 陌生人告警处理」的完整闭环。</span></li><li><span>配套一键安装与启动脚本，适合作为教学演示与中小型私有化部署的参考实现。</span></li></ul><div class="pcard-tech"><span class="tag">Python</span><span class="tag">Django</span><span class="tag">OpenCV</span><span class="tag">Vue 3</span><span class="tag">JavaScript</span><span class="tag">Haar 检测</span><span class="tag">LBPH 识别</span></div></div><div class="pcard-foot"><a class="btn btn-glass btn-sm" href="https://github.com/Drgonmancer/FaceLens" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「FaceGuard · 人脸识别身份管理平台」的 GitHub 仓库"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 19c-4.5 1.4-4.5-2.2-6-2.8m12 5v-3.6a3 3 0 0 0-.8-2.3c2.7-.3 5.5-1.3 5.5-6a4.7 4.7 0 0 0-1.3-3.2 4.4 4.4 0 0 0-.1-3.3s-1-.3-3.4 1.3a11.6 11.6 0 0 0-6.1 0C6.2 3.7 5.2 4 5.2 4a4.4 4.4 0 0 0-.1 3.3A4.7 4.7 0 0 0 3.8 10.5c0 4.6 2.8 5.6 5.5 6a3 3 0 0 0-.8 2.3V22"></path></svg> GitHub 仓库</a></div></article><article class="glass spec pcard"><a class="pcard-link" href="https://github.com/Drgonmancer/AI-Powered-Video-Downloader" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「AI 万能视频下载器」的 GitHub 仓库"></a><div class="pcard-thumb"><img src="assets/proj-vdl.webp" alt="AI 万能视频下载器控制台界面：链接解析输入框、下载队列实时进度与已完成任务列表" width="1280" height="720" loading="lazy" decoding="async"></div><div class="pcard-hd"><h3>AI 万能视频下载器</h3><div class="pcard-meta"><span class="tag tag-accent">负责人</span><span class="tag">2026.05 — 2026.06</span></div></div><div class="pcard-body"><p class="pcard-desc">本地 Web 应用：多平台视频解析与下载，实时进度推送，可选 AI 生成内容摘要、字幕要点与思维导图。</p><ul class="pcard-points"><li><span>解析链路基于 yt-dlp 覆盖 1000+ 站点；抖音做专项适配，短链 / 标准链接 / 图文笔记均可，无水印直链且多数场景免 Cookie。</span></li><li><span>WebSocket 实时推送进度、速度与状态，替代轮询刷新；相同链接二次解析走缓存。</span></li><li><span>可选接入任意 OpenAI 兼容大模型，一键生成结构化摘要、字幕要点与 Markmap 思维导图，支持导出 MD / SVG。</span></li><li><span>内置 JWT 账号体系、Stripe 订阅与每日下载配额，可 fork 成自己的 Video SaaS；Docker / Render 一键部署。</span></li></ul><div class="pcard-tech"><span class="tag">Vue 3</span><span class="tag">Vite</span><span class="tag">Pinia</span><span class="tag">Tailwind CSS</span><span class="tag">FastAPI</span><span class="tag">WebSocket</span><span class="tag">yt-dlp</span><span class="tag">ffmpeg</span><span class="tag">Stripe</span></div></div><div class="pcard-foot"><a class="btn btn-glass btn-sm" href="https://github.com/Drgonmancer/AI-Powered-Video-Downloader" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「AI 万能视频下载器」的 GitHub 仓库"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 19c-4.5 1.4-4.5-2.2-6-2.8m12 5v-3.6a3 3 0 0 0-.8-2.3c2.7-.3 5.5-1.3 5.5-6a4.7 4.7 0 0 0-1.3-3.2 4.4 4.4 0 0 0-.1-3.3s-1-.3-3.4 1.3a11.6 11.6 0 0 0-6.1 0C6.2 3.7 5.2 4 5.2 4a4.4 4.4 0 0 0-.1 3.3A4.7 4.7 0 0 0 3.8 10.5c0 4.6 2.8 5.6 5.5 6a3 3 0 0 0-.8 2.3V22"></path></svg> GitHub 仓库</a></div></article><article class="glass spec pcard"><a class="pcard-link" href="https://github.com/Drgonmancer/Leo_code" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「Python 全栈入门教程」的 GitHub 仓库"></a><div class="pcard-thumb"><img src="assets/proj-leo.webp" alt="Python 全栈入门教程文档站界面：左侧八章目录导航、正文标题与本地启动代码块" width="1280" height="720" loading="lazy" decoding="async"></div><div class="pcard-hd"><h3>Python 全栈入门教程</h3><div class="pcard-meta"><span class="tag tag-accent">作者</span><span class="tag">2026.02 — 2026.06</span></div></div><div class="pcard-body"><p class="pcard-desc">边学边练的 Python 全栈教程站：8 大篇章外加项目部署附录，Docsify 驱动，配图讲解，推送即自动发布。</p><ul class="pcard-points"><li><span>8 大篇章覆盖基础语法、面向对象、Linux 命令、Web 服务器、多任务编程、前端基础、MySQL 与 Redis，共 60 余篇。</span></li><li><span>每篇配章节导读、Mermaid 流程图与实战案例（学员管理系统、烤地瓜、搬家具等），并附完整代码与练习。</span></li><li><span>推送 main 分支由 GitHub Actions 自动同步到 gh-pages，线上站提供左侧目录导航与点击跳转。</span></li></ul><div class="pcard-tech"><span class="tag">Docsify</span><span class="tag">Markdown</span><span class="tag">Mermaid</span><span class="tag">GitHub Pages</span><span class="tag">GitHub Actions</span></div></div><div class="pcard-foot"><a class="btn btn-glass btn-sm" href="https://github.com/Drgonmancer/Leo_code" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开项目「Python 全栈入门教程」的 GitHub 仓库"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 19c-4.5 1.4-4.5-2.2-6-2.8m12 5v-3.6a3 3 0 0 0-.8-2.3c2.7-.3 5.5-1.3 5.5-6a4.7 4.7 0 0 0-1.3-3.2 4.4 4.4 0 0 0-.1-3.3s-1-.3-3.4 1.3a11.6 11.6 0 0 0-6.1 0C6.2 3.7 5.2 4 5.2 4a4.4 4.4 0 0 0-.1 3.3A4.7 4.7 0 0 0 3.8 10.5c0 4.6 2.8 5.6 5.5 6a3 3 0 0 0-.8 2.3V22"></path></svg> GitHub 仓库</a></div></article></div>
+    </div>
+  </section>
+
+  <!-- ================= 05 联系 ================= -->
+  <section class="sec" id="contact" aria-labelledby="tContact">
+    <div class="wrap">
+      <div class="glass spec contact">
+        <div>
+          <span class="eyebrow">05 — Contact</span>
+          <h2 id="tContact" style="margin-top:14px">聊聊合作，<br>或者只是打个招呼</h2>
+          <p>
+            我在找 AI 应用开发 / 后端开发方向的机会，base 杭州或南京都可以。
+            如果你在做 Agent 相关的产品，需要有人把它从原型推到线上，欢迎直接联系。
+          </p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:26px">
+            <a class="btn btn-primary" id="ctaMail" href="mailto:leocai040727@gmail.com">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.6" y="4.6" width="18.8" height="14.8" rx="3"></rect><path d="M3.4 7.4l8.6 5.6 8.6-5.6"></path></svg>
+              发一封邮件
+            </a>
+            <a class="btn btn-glass" id="ctaGh" href="https://github.com/Drgonmancer" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开我的 GitHub 主页">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.36 1.09 2.93.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2z"></path></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+        <div class="clinks" id="contactBox"><a class="clink" href="https://github.com/Drgonmancer" target="_blank" rel="noopener noreferrer" aria-label="GitHub：@Drgonmancer"><span class="clink-ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 19c-4.5 1.4-4.5-2.2-6-2.8m12 5v-3.6a3 3 0 0 0-.8-2.3c2.7-.3 5.5-1.3 5.5-6a4.7 4.7 0 0 0-1.3-3.2 4.4 4.4 0 0 0-.1-3.3s-1-.3-3.4 1.3a11.6 11.6 0 0 0-6.1 0C6.2 3.7 5.2 4 5.2 4a4.4 4.4 0 0 0-.1 3.3A4.7 4.7 0 0 0 3.8 10.5c0 4.6 2.8 5.6 5.5 6a3 3 0 0 0-.8 2.3V22"></path></svg></span><span><span class="clink-label">GitHub</span><br><span class="clink-value">@Drgonmancer</span></span><span class="clink-arrow" aria-hidden="true">↗</span></a><a class="clink" href="mailto:leocai040727@gmail.com" aria-label="主邮箱：leocai040727@gmail.com"><span class="clink-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.6" y="4.6" width="18.8" height="14.8" rx="3"></rect><path d="M3.4 7.4l8.6 5.6 8.6-5.6"></path></svg></span><span><span class="clink-label">主邮箱</span><br><span class="clink-value">leocai040727@gmail.com</span></span><span class="clink-arrow" aria-hidden="true">↗</span></a><a class="clink" href="mailto:1322590771@qq.com" aria-label="备用邮箱：1322590771@qq.com"><span class="clink-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.6" y="4.6" width="18.8" height="14.8" rx="3"></rect><path d="M3.4 7.4l8.6 5.6 8.6-5.6"></path></svg></span><span><span class="clink-label">备用邮箱</span><br><span class="clink-value">1322590771@qq.com</span></span><span class="clink-arrow" aria-hidden="true">↗</span></a><a class="clink" href="tel:19822663760" aria-label="电话：19822663760"><span class="clink-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16.9v2.6a1.9 1.9 0 0 1-2.1 1.9 19 19 0 0 1-8.3-3 18.7 18.7 0 0 1-5.7-5.7 19 19 0 0 1-3-8.4A1.9 1.9 0 0 1 3.8 2.2h2.6a1.9 1.9 0 0 1 1.9 1.6c.1 1 .4 2 .7 2.9a1.9 1.9 0 0 1-.4 2L7.5 9.9a15 15 0 0 0 5.7 5.7l1.2-1.1a1.9 1.9 0 0 1 2-.5c.9.3 1.9.6 2.9.7a1.9 1.9 0 0 1 1.6 1.9z"></path></svg></span><span><span class="clink-label">电话</span><br><span class="clink-value">19822663760</span></span><span class="clink-arrow" aria-hidden="true">↗</span></a><div class="clink"><span class="clink-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span><span><span class="clink-label">所在地</span><br><span class="clink-value">江苏南京 / 浙江杭州</span></span><span class="clink-arrow" aria-hidden="true"></span></div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ================= 页脚 ================= -->
+<footer class="foot">
+  <div class="wrap foot-in">
+    <span>© <span id="year">2026</span> 蔡昕辰 Cai Xinchen · All rights reserved.</span>
+    <div class="foot-links">
+      <a href="https://github.com/Drgonmancer" target="_blank" rel="noopener noreferrer" aria-label="在新标签页打开我的 GitHub 主页" title="GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.36 1.09 2.93.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2z"/></svg>
+      </a>
+      <a href="mailto:leocai040727@gmail.com" aria-label="给我发送邮件" title="邮箱">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.6" y="4.6" width="18.8" height="14.8" rx="3"/><path d="M3.4 7.4l8.6 5.6 8.6-5.6"/></svg>
+      </a>
+      <a href="tel:19822663760" aria-label="拨打电话 19822663760" title="电话">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16.9v2.6a1.9 1.9 0 0 1-2.1 1.9 19 19 0 0 1-8.3-3 18.7 18.7 0 0 1-5.7-5.7 19 19 0 0 1-3-8.4A1.9 1.9 0 0 1 3.8 2.2h2.6a1.9 1.9 0 0 1 1.9 1.6c.1 1 .4 2 .7 2.9a1.9 1.9 0 0 1-.4 2L7.5 9.9a15 15 0 0 0 5.7 5.7l1.2-1.1a1.9 1.9 0 0 1 2-.5c.9.3 1.9.6 2.9.7a1.9 1.9 0 0 1 1.6 1.9z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<button class="to-top" id="toTop" type="button" aria-label="回到页面顶部" title="回到顶部">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5.5 11.5 12 5l6.5 6.5"/></svg>
+</button>
+
+<script>
+/* ==========================================================================
+   数据层与渲染（Bento 技能栅格 + 鼠标跟随镜面高光 + 移动端汉堡菜单）
+   数据全部集中在下方各常量里，改内容只需改这里，不用碰 HTML
+   ========================================================================== */
+'use strict';
+
+var P = {
+  github: 'https://github.com/Drgonmancer', githubUser: 'Drgonmancer',
+  email: 'leocai040727@gmail.com', emailAlt: '1322590771@qq.com',
+  phone: '19822663760', location: '江苏南京 / 浙江杭州',
+  school: '南京工业大学浦江学院'
+};
+
+var STATS = [
+  { n: '120万+', t: '条历史数据清洗与批量导入' },
+  { n: '9 个',   t: '独立开发的公开仓库' },
+  { n: '59 个',  t: '自动化测试覆盖容错与幂等' },
+  { n: '80%+',   t: '短剧生产链路人工干预减少' }
+];
+
+var PROFILE_ROWS = [
+  ['求职方向', 'AI 应用 / 后端开发'],
+  ['期望城市', '杭州 · 南京'],
+  ['学历', '本科 · 2026.06 毕业'],
+  ['英语', 'CET-4 / CET-6']
+];
+
+var FACTS = [
+  ['院校', '南京工业大学浦江学院'],
+  ['专业', '软件工程（本科）'],
+  ['在读时间', '2022.09 — 2026.06'],
+  ['核心课程', 'Java / Python / 数据结构 / 操作系统 / 计算机网络 / Web 开发 / 软件测试 / 云计算'],
+  ['代码托管', '@' + P.githubUser]
+];
+
+var CAMPUS = [
+  { org: '英语语言与文化协会 · 活动部部长', period: '2023.03 — 2023.12', txt: '统筹校内英语活动执行与物资采购；协助英语教学部完成空中英语课堂考题编辑及期末试卷批改。' },
+  { org: '校武术队 · 队长', period: '2023.06 — 2024.12', txt: '统筹校内大型体育活动，负责经费申请与策划书撰写，成功举办武术比赛与文化节；主导与南京石湫政府合作的武术传统文化巡演项目。' }
+];
+
+var CERTS = ['计算机三级 · 网络技术', '计算机四级 · 网络工程师', 'CET-4 大学英语四级', 'CET-6 大学英语六级', '普通话二级甲等'];
+
+var SKILLS = [
+  { name: 'AI 应用开发', icon: 'sparkle', span: 3, known: ['LangChain', 'LangGraph', 'MCP', 'RAG', 'Embedding', 'Prompt 工程', 'Function Calling'], basic: ['A2A'] },
+  { name: '后端开发', icon: 'server', span: 3, known: ['Python', 'Django', 'FastAPI'], basic: ['Flask', 'Java', 'Node.js'] },
+  { name: '数据存储', icon: 'database', span: 2, known: ['MySQL', 'SQLite', 'PostgreSQL'], basic: ['MongoDB', 'Oracle', 'ClickHouse'] },
+  { name: '中间件', icon: 'layers', span: 2, known: ['Redis', 'Celery', 'RabbitMQ'], basic: ['Redis Pub/Sub'] },
+  { name: '部署与工程化', icon: 'ship', span: 2, known: ['Linux', 'Docker', 'Nginx'], basic: ['AWS EC2 / S3', '阿里云 ECS'] },
+  { name: '前端能力', icon: 'layout', span: 3, known: ['Vue 3', 'TypeScript', 'React 18', 'Vite'], basic: ['Next.js', 'Taro 4', '微信小程序'] },
+  { name: 'AI 编程工具', icon: 'terminal', span: 3, known: ['Claude Code', 'Cursor', 'Codex', 'Trae', 'WorkBuddy', 'Ollama'], basic: ['Open Code', 'Open Claw', 'Hermes'] }
+];
+
+var JOBS = [
+  {
+    co: '杭州畅游未来科技有限公司', role: 'AI 落地工程师', period: '2026.06 — 2026.07 · 在职',
+    stack: ['Python', 'Flask', 'FastAPI', 'LangChain', 'TypeScript', 'Node.js', 'Vue 3', 'Next.js', 'Git'],
+    points: [
+      '负责电商 AI 工具平台核心业务开发，用 Flask + Gunicorn + Gevent 搭建高并发异步后端，整合 GPT、Claude、Gemini 等多家 AI 服务商，构建从选品策划、图片生成到视频制作的全链路内容生产系统。',
+      '开发批量出图智能体（Node.js + GPT-4o + GPT-Image-2）：设计「导演-作画」两段式流水线，单张生成从 6 分钟降至 2-3 分钟 <span class="metric">效率提升 2-3 倍</span>，支持并发 4 路与 128MB 批量上传处理。',
+      '开发场景复刻工具 · 氛围图生成平台（Next.js 16 + React 19 + Claude Opus）：实现爆款主图氛围维度提炼与白底产品图氛围迁移，支持 1-10 张批量参考图分析，<span class="metric">用户满意度提升 35%</span>。',
+      '主导主图 CTR 诊断模块（FastAPI + Pydantic v2 + 多模态 LLM + Docker/Vercel）：采用「评估同步 + 生图异步」轮询混合架构，抽象依赖 Protocol 层解耦业务与站点，完成双计费点幂等扣分，<span class="metric">59 个自动化测试</span>覆盖容错与计费幂等。',
+      '主导 AI 短剧自动化生产平台架构设计（Nuxt 3 + Hono + Mastra AI）：开发剧本改写、角色提取、分镜拆解、音色分配、提示词生成共 5 个专用 Agent，集成 6 家图片 / 4 家视频 / 1 家 TTS 服务商，<span class="metric">人工干预减少 80%+</span>，单集制作从 2-3 天降至 2-3 小时。'
+    ]
+  },
+  {
+    co: '国新健康保障服务有限公司', role: '技术实施（实习生）', period: '2025.08 — 2026.02',
+    stack: ['Python', 'Java', 'Linux', 'MySQL', 'Oracle', 'MongoDB', 'ClickHouse', 'Docker', 'Nginx', 'OpenAPI'],
+    points: [
+      '在江西省医保局信息平台建设场景下，负责九江市两定资源、九江市信用评价与诊间审核相关的数据处理，以及宜春市奉新人民医院的系统部署与测试联调工作。',
+      '编写 Python 数据清洗与转换脚本，完成 <span class="metric">120 万+ 条</span>历史数据标准化处理与批量导入，数据准确率稳定在 <span class="metric">90%+</span>。',
+      '独立完成 Linux 环境部署：安装配置 MySQL / MongoDB / ClickHouse、多微服务引擎（8086-8088）、防火墙策略与 NTP 同步，打通从环境搭建到应用启动的全流程。',
+      '协助完成信用评价子系统测试联调，覆盖信用采集、信用评定、红黑白灰名单、统计分析等 10+ 核心模块；完成 5 个核心接口联调，定位并推动修复 7 个字段格式与交互异常问题。'
+    ]
+  }
+];
+
+var PROJECTS = [
+  {
+    title: 'AI 闯关学习小程序', role: '负责人', period: '2026.07 — 2026.08',
+    desc: '基于 ReAct 智能体 + RAG 知识库的闯关式学习小程序，支持联网检索出题、结构化判分与 AI 自动配图。',
+    points: [
+      '基于 LangGraph 构建 ReAct 出题智能体，接入 Tavily 联网搜索，由模型自主决定检索关键词与轮次，解决大模型知识截止导致的题目过时问题。',
+      '用 LangChain 将模型输出稳定约束为结构化 JSON（单选 / 多选 / 判断三类题型），保证前端渲染与判分逻辑可靠。',
+      '设计异步出题任务架构：POST 提交 + GET 轮询，配合 asyncio 并发与超时管理，避免长耗时 LLM 调用阻塞请求链路。',
+      '从 0 实现 RAG 知识库：PDF / Word / Markdown 解析 → 分块 → 百炼 text-embedding-v4 向量化存入 Chroma → Top-K 4 检索增强。'
+    ],
+    tech: ['Python', 'FastAPI', 'LangGraph', 'DeepSeek', 'Tavily', 'Chroma', 'Taro 4', 'Docker'],
+    thumb: 'assets/proj-quest.webp',
+    thumbAlt: 'AI 闯关学习小程序界面：答题选项正误高亮与解析、通关报告掌握度评分、知识库文档已就绪',
+    github: 'https://github.com/Drgonmancer/ai-quest-learning-mini-program'
+  },
+  {
+    title: '多 Agent 求职辅助系统', role: '负责人', period: '2026.06 — 2026.07',
+    desc: '围绕「岗位分析 → 简历匹配 → 低分优化 → 求职建议」真实链路的多 Agent 可恢复状态图系统。',
+    points: [
+      '基于开源多 Agent 方案落地可恢复状态图系统，完成前后端联调与容器化启动。',
+      '采用 Supervisor 与岗位分析、简历评审、简历优化、职业教练四角色协作；LangGraph 的 Send 并行、子图与低分回路实现可回路优化。',
+      '基于 SQLite Checkpoint 管理 thread_id 会话状态，支持中断恢复与历史快照读取。',
+      '使用 FastAPI 提供认证、会话管理、简历上传（txt / md / pdf）与图执行接口，Vue 前端完成分析空间与结果展示。'
+    ],
+    tech: ['Python', 'LangGraph', 'FastAPI', 'Vue 3', 'SQLite Checkpoint', 'Docker Compose'],
+    thumb: 'assets/proj-jobmatch.webp',
+    thumbAlt: '多 Agent 求职辅助系统工作台界面：求职目标输入、运行分析表单与会话摘要统计面板',
+    github: 'https://github.com/Drgonmancer/job-match-workflow'
+  },
+  {
+    title: 'AI 智能图文创作器', role: '负责人', period: '2026.05 — 2026.06',
+    desc: '7 Agent 三阶段编排的图文创作平台，支持人机协作断点、SSE 实时进度推送与一键容器化部署。',
+    points: [
+      '基于 LangGraph 设计 7 Agent 三阶段编排流水线（选题 / 标题 / 大纲 / 正文 / 配图 / 评审），通过 SceneRegistry 为 3 场景配置独立 Prompt 模板与 Graph 工厂。',
+      '实现三阶段人机协作（HITL）断点：标题生成后暂停待用户选择、大纲支持拖拽编辑与自然语言 AI 修改；基于 Redis Pub/Sub 驱动 SSE 实时进度推送。',
+      '搭建 FastAPI 后端，设计 22 个 REST / SSE 接口，落地 JWT 鉴权、每日配额与 Mock VIP 会员体系。',
+      '建设 Agent Trace 管理后台，双写 LangSmith 与本地日志，可视化 Token 消耗与耗时。'
+    ],
+    tech: ['Python', 'FastAPI', 'LangGraph', 'Vue 3', 'Redis', 'SSE', 'DeepSeek', 'Docker'],
+    thumb: 'assets/proj-studio.webp',
+    thumbAlt: 'AI 智能图文创作器创作页界面：智能体流程时间轴、选题输入与场景选择、创作配额面板',
+    github: 'https://github.com/Drgonmancer/AI-Image-Text-Studio'
+  },
+
+  /* ---------- 以下 6 个来自同一账号下的其余公开仓库 ---------- */
+
+  {
+    title: '生产级客服 Agent', role: '负责人', period: '2026.08',
+    desc: '面向生产环境的客服工作流：Supervisor 调度专职子 Agent，大额退款必须人工审批，护栏与评估内嵌在链路里，全离线可跑。',
+    points: [
+      '用 LangGraph 的 StateGraph 做 Supervisor 路由，把消息分派给专职子 Agent；路由是带类型、可单测的函数，而不是一条自由发挥的 Prompt。',
+      '金额相关操作全部落成有类型、有测试的 Python 工具，模型只负责意图分类与措辞，绝不做钱的算术。',
+      '中额退款在 <span class="metric">interrupt()</span> 上暂停等人工裁决，状态经 checkpointer 跨暂停保留；超过硬上限的退款在治理层被结构性拒绝。',
+      'guard_input / guard_output 逐轮包裹：入站脱敏 PII 并拦截提示注入，出站绝不回吐 PII；14 条标注场景的 eval 套件在 CI 上守门。'
+    ],
+    tech: ['Python', 'LangGraph', 'Langfuse', 'Pydantic', 'MCP', 'BM25 RAG', 'pytest', 'Ruff'],
+    thumb: 'assets/proj-support.webp',
+    thumbAlt: '生产级客服 Agent 的终端实录：customer-support-agent eval 输出七项指标全部通过，GATE PASSED',
+    github: 'https://github.com/Drgonmancer/customer-support-agent'
+  },
+  {
+    title: 'Agentic RAG 系统', role: '负责人', period: '2026.08',
+    desc: '端到端的 Agentic RAG：PDF 转 Markdown 后层次化分块、Qdrant 向量检索、Map-Reduce 并行子查询，并用 RAGAS 量化评测。',
+    points: [
+      '层次索引：用小颗粒度子块保证检索精度，命中后回溯父块补足上下文，兼顾精度与信息完整度。',
+      '多智能体 Map-Reduce：把复杂问题拆成最多 3 条并行子查询，各自由独立子图完成「检索 → 自纠 → 收敛」。',
+      '会话滚动摘要 + 查询改写让多轮追问不断片；语义不清时在 interrupt 上暂停，先向用户澄清再检索。',
+      '工具调用预算与上下文压缩控制长链路开销；RAGAS 五项指标量化检索与回答质量，Langfuse 全链路可观测。'
+    ],
+    tech: ['Python', 'LangGraph', 'Qdrant', 'Ollama', 'Gradio', 'RAGAS', 'Langfuse', 'Docker'],
+    thumb: 'assets/proj-rag.webp',
+    thumbAlt: 'Agentic RAG 的 Gradio 对话界面：历史摘要、查询改写与检索父块的完整链路展示',
+    github: 'https://github.com/Drgonmancer/rag-agent-workflow'
+  },
+  {
+    title: 'Pulse · AI 热点监控与决策助手', role: '负责人', period: '2026.05 — 2026.06',
+    desc: '聚合 15+ 平台热点的实时监控台：定时采集、跨平台关键词搜索、勾选式 AI 分析，WebSocket 秒级推送到前端。',
+    points: [
+      '自研采集服务统一 15+ 数据源（百度 / 微博 / B站 / GitHub / HN / Reddit / Google News 等）的字段口径，支持来源筛选与混合排序。',
+      '关键词跨平台并行搜索，结果自动去重入库，各平台成功与失败状态单独回传。',
+      'Socket.IO 推送新热点入库与 AI 分析完成事件，前端顶部 LIVE 指示灯与列表始终保持最新。',
+      '「先勾选、再分析」按需调用 DeepSeek，输出相关性评分、中文摘要与重要性判断；未配置 Key 时其余功能完全可用。'
+    ],
+    tech: ['React 18', 'TypeScript', 'Express', 'Prisma', 'SQLite', 'Socket.IO', 'DeepSeek', 'Vite'],
+    thumb: 'assets/proj-buzz.webp',
+    thumbAlt: 'Pulse 热点监控台界面：多平台热点列表、来源筛选、相关性评分与热度趋势迷你图',
+    github: 'https://github.com/Drgonmancer/AI-real-time-buzz-tracker'
+  },
+  {
+    title: 'FaceGuard · 人脸识别身份管理平台', role: '负责人', period: '2026.05 — 2026.06',
+    desc: '基于 OpenCV 与 Django 的 B/S 人脸识别身份管理平台：浏览器完成注册与人脸采集，支持刷脸或密码登录与陌生人告警。',
+    points: [
+      '采用 Haar 检测 + LBPH 识别，纯 CPU 即可运行，无需 GPU，人脸数据全部本地存储、不出内网。',
+      '管理后台提供注册用户、今日登录、陌生人告警、识别成功率四项实时指标，以及近 7 日登录趋势与登录方式分布。',
+      '打通「注册 → 人脸采集 → 模型训练 → 刷脸 / 密码双通道登录 → 陌生人告警处理」的完整闭环。',
+      '配套一键安装与启动脚本，适合作为教学演示与中小型私有化部署的参考实现。'
+    ],
+    tech: ['Python', 'Django', 'OpenCV', 'Vue 3', 'JavaScript', 'Haar 检测', 'LBPH 识别'],
+    thumb: 'assets/proj-facelens.webp',
+    thumbAlt: 'FaceGuard 管理后台界面：注册用户与登录统计卡片、近 7 日登录趋势折线图、登录方式分布环形图、最近登录记录',
+    github: 'https://github.com/Drgonmancer/FaceLens'
+  },
+  {
+    title: 'AI 万能视频下载器', role: '负责人', period: '2026.05 — 2026.06',
+    desc: '本地 Web 应用：多平台视频解析与下载，实时进度推送，可选 AI 生成内容摘要、字幕要点与思维导图。',
+    points: [
+      '解析链路基于 yt-dlp 覆盖 1000+ 站点；抖音做专项适配，短链 / 标准链接 / 图文笔记均可，无水印直链且多数场景免 Cookie。',
+      'WebSocket 实时推送进度、速度与状态，替代轮询刷新；相同链接二次解析走缓存。',
+      '可选接入任意 OpenAI 兼容大模型，一键生成结构化摘要、字幕要点与 Markmap 思维导图，支持导出 MD / SVG。',
+      '内置 JWT 账号体系、Stripe 订阅与每日下载配额，可 fork 成自己的 Video SaaS；Docker / Render 一键部署。'
+    ],
+    tech: ['Vue 3', 'Vite', 'Pinia', 'Tailwind CSS', 'FastAPI', 'WebSocket', 'yt-dlp', 'ffmpeg', 'Stripe'],
+    thumb: 'assets/proj-vdl.webp',
+    thumbAlt: 'AI 万能视频下载器控制台界面：链接解析输入框、下载队列实时进度与已完成任务列表',
+    github: 'https://github.com/Drgonmancer/AI-Powered-Video-Downloader'
+  },
+  {
+    title: 'Python 全栈入门教程', role: '作者', period: '2026.02 — 2026.06',
+    desc: '边学边练的 Python 全栈教程站：8 大篇章外加项目部署附录，Docsify 驱动，配图讲解，推送即自动发布。',
+    points: [
+      '8 大篇章覆盖基础语法、面向对象、Linux 命令、Web 服务器、多任务编程、前端基础、MySQL 与 Redis，共 60 余篇。',
+      '每篇配章节导读、Mermaid 流程图与实战案例（学员管理系统、烤地瓜、搬家具等），并附完整代码与练习。',
+      '推送 main 分支由 GitHub Actions 自动同步到 gh-pages，线上站提供左侧目录导航与点击跳转。'
+    ],
+    tech: ['Docsify', 'Markdown', 'Mermaid', 'GitHub Pages', 'GitHub Actions'],
+    thumb: 'assets/proj-leo.webp',
+    thumbAlt: 'Python 全栈入门教程文档站界面：左侧八章目录导航、正文标题与本地启动代码块',
+    github: 'https://github.com/Drgonmancer/Leo_code'
+  }
+];
+
+var ICONS = {
+  sparkle: '<path d="M12 3.2 13.9 9l5.8 1.9-5.8 1.9L12 18.6l-1.9-5.8L4.3 10.9 10.1 9z"/>',
+  server: '<rect x="3" y="4" width="18" height="7" rx="1.6"/><rect x="3" y="13" width="18" height="7" rx="1.6"/><path d="M7 7.5h.01M7 16.5h.01"/>',
+  database: '<ellipse cx="12" cy="6" rx="8" ry="3.2"/><path d="M4 6v12c0 1.8 3.6 3.2 8 3.2s8-1.4 8-3.2V6"/><path d="M4 12c0 1.8 3.6 3.2 8 3.2s8-1.4 8-3.2"/>',
+  layers: '<path d="M12 3 3 7.8l9 4.8 9-4.8z"/><path d="M3 12.4l9 4.8 9-4.8"/>',
+  ship: '<path d="M3 15.5 12 12l9 3.5-4 5.5H7z"/><path d="M12 12V3.5l5 3v6"/>',
+  layout: '<rect x="3" y="3" width="18" height="18" rx="2.6"/><path d="M3 9h18M9 21V9"/>',
+  terminal: '<path d="M5 8l4 4-4 4"/><path d="M12.5 16H19"/><rect x="2" y="3.5" width="20" height="17" rx="2.6"/>',
+  github: '<path d="M9 19c-4.5 1.4-4.5-2.2-6-2.8m12 5v-3.6a3 3 0 0 0-.8-2.3c2.7-.3 5.5-1.3 5.5-6a4.7 4.7 0 0 0-1.3-3.2 4.4 4.4 0 0 0-.1-3.3s-1-.3-3.4 1.3a11.6 11.6 0 0 0-6.1 0C6.2 3.7 5.2 4 5.2 4a4.4 4.4 0 0 0-.1 3.3A4.7 4.7 0 0 0 3.8 10.5c0 4.6 2.8 5.6 5.5 6a3 3 0 0 0-.8 2.3V22"/>',
+  mail: '<rect x="2.6" y="4.6" width="18.8" height="14.8" rx="3"/><path d="M3.4 7.4l8.6 5.6 8.6-5.6"/>',
+  phone: '<path d="M21 16.9v2.6a1.9 1.9 0 0 1-2.1 1.9 19 19 0 0 1-8.3-3 18.7 18.7 0 0 1-5.7-5.7 19 19 0 0 1-3-8.4A1.9 1.9 0 0 1 3.8 2.2h2.6a1.9 1.9 0 0 1 1.9 1.6c.1 1 .4 2 .7 2.9a1.9 1.9 0 0 1-.4 2L7.5 9.9a15 15 0 0 0 5.7 5.7l1.2-1.1a1.9 1.9 0 0 1 2-.5c.9.3 1.9.6 2.9.7a1.9 1.9 0 0 1 1.6 1.9z"/>',
+  pin: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>'
+};
+
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function ic(n) {
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ' +
+         'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONS[n] || ICONS.sparkle) + '</svg>';
+}
+function icFill(n) {
+  return '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' + (ICONS[n] || '') + '</svg>';
+}
+function $(id) { return document.getElementById(id); }
+/* 安全的降级动效检测：老浏览器没有 matchMedia 时不应抛错中断后续脚本 */
+function prefersReduce() {
+  return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+function rows(list) {
+  return list.map(function (r) { return '<div><dt>' + esc(r[0]) + '</dt><dd>' + r[1] + '</dd></div>'; }).join('');
+}
+
+/* ---------- Hero 药丸 ---------- */
+$('heroMeta').innerHTML = [
+  '<span class="pill">' + P.location + '</span>',
+  '<span class="pill">2026 届 · 本科</span>',
+  '<span class="pill">9 个公开仓库</span>',
+  '<span class="pill">CET-6</span>'
+].join('');
+
+/* ---------- 资料卡 ---------- */
+$('profileRows').innerHTML = rows(PROFILE_ROWS);
+$('factRows').innerHTML = rows(FACTS.map(function (f) {
+  return f[0] === '代码托管'
+    ? [f[0], '<a href="' + esc(P.github) + '" target="_blank" rel="noopener noreferrer" style="color:#C4B5FD">' + esc(f[1]) + ' ↗</a>']
+    : f;
+}));
+
+/* ---------- 指标 ---------- */
+$('statsBox').innerHTML = STATS.map(function (s) {
+  return '<div class="glass spec stat"><p class="stat-num grad-text">' + esc(s.n) + '</p>' +
+         '<p class="stat-label">' + esc(s.t) + '</p></div>';
+}).join('');
+
+/* ---------- 校园 / 证书 ---------- */
+$('campusBox').innerHTML = CAMPUS.map(function (c) {
+  return '<div class="campus-item">' +
+    '<div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline">' +
+      '<span class="campus-org">' + esc(c.org) + '</span>' +
+      '<span class="campus-period">' + esc(c.period) + '</span></div>' +
+    '<p class="campus-txt">' + esc(c.txt) + '</p></div>';
+}).join('');
+
+$('certBox').innerHTML = CERTS.map(function (c) { return '<span class="tag">' + esc(c) + '</span>'; }).join('');
+
+/* ---------- 技能 Bento ---------- */
+$('skillBox').innerHTML = SKILLS.map(function (g) {
+  var known = '<div class="tier"><span class="tier-k k-now">熟悉</span><div class="tags">' +
+    g.known.map(function (t) { return '<span class="tag tag-accent">' + esc(t) + '</span>'; }).join('') + '</div></div>';
+  var basic = g.basic.length
+    ? '<div class="tier"><span class="tier-k">了解</span><div class="tags">' +
+      g.basic.map(function (t) { return '<span class="tag tag-dim">' + esc(t) + '</span>'; }).join('') + '</div></div>' : '';
+  return '<article class="glass spec skill-card span' + g.span + '">' +
+    '<div class="skill-hd"><span class="skill-ico">' + ic(g.icon) + '</span>' +
+      '<h3 class="skill-name">' + esc(g.name) + '</h3></div>' +
+    known + basic +
+  '</article>';
+}).join('');
+
+/* ---------- 经历 ---------- */
+$('jobBox').innerHTML = JOBS.map(function (j) {
+  return '<article class="glass spec job">' +
+    '<div class="job-hd">' +
+      '<span class="job-co">' + esc(j.co) + '</span>' +
+      '<span class="job-role">' + esc(j.role) + '</span>' +
+      '<span class="job-period">' + esc(j.period) + '</span>' +
+    '</div>' +
+    '<ul class="job-points">' + j.points.map(function (p) { return '<li><span>' + p + '</span></li>'; }).join('') + '</ul>' +
+    '<div class="job-stack">' + j.stack.map(function (s) { return '<span class="tag">' + esc(s) + '</span>'; }).join('') + '</div>' +
+  '</article>';
+}).join('');
+
+/* ---------- 项目（整卡可点击 → 新标签页打开 GitHub） ---------- */
+$('projBox').innerHTML = PROJECTS.map(function (p) {
+  var label = '在新标签页打开项目「' + p.title + '」的 GitHub 仓库';
+  var shot = p.thumb
+    ? '<div class="pcard-thumb">' +
+        '<img src="' + esc(p.thumb) + '" alt="' + esc(p.thumbAlt || (p.title + ' 界面截图')) + '" ' +
+          'width="1280" height="720" loading="lazy" decoding="async">' +
+      '</div>'
+    : '';
+  return '<article class="glass spec pcard">' +
+    '<a class="pcard-link" href="' + esc(p.github) + '" target="_blank" rel="noopener noreferrer" ' +
+      'aria-label="' + esc(label) + '"></a>' +
+    shot +
+    '<div class="pcard-hd"><h3>' + esc(p.title) + '</h3>' +
+      '<div class="pcard-meta"><span class="tag tag-accent">' + esc(p.role) + '</span>' +
+      '<span class="tag">' + esc(p.period) + '</span></div></div>' +
+    '<div class="pcard-body">' +
+      '<p class="pcard-desc">' + esc(p.desc) + '</p>' +
+      '<ul class="pcard-points">' + p.points.map(function (x) { return '<li><span>' + esc(x) + '</span></li>'; }).join('') + '</ul>' +
+      '<div class="pcard-tech">' + p.tech.map(function (t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('') + '</div>' +
+    '</div>' +
+    '<div class="pcard-foot">' +
+      '<a class="btn btn-glass btn-sm" href="' + esc(p.github) + '" target="_blank" rel="noopener noreferrer" ' +
+        'aria-label="' + esc(label) + '">' + icFill('github') + ' GitHub 仓库</a>' +
+    '</div>' +
+  '</article>';
+}).join('');
+
+/* ---------- 联系 ---------- */
+$('contactBox').innerHTML = [
+  ['GitHub', '@' + P.githubUser, P.github, 'github', true],
+  ['主邮箱', P.email, 'mailto:' + P.email, 'mail', false],
+  ['备用邮箱', P.emailAlt, 'mailto:' + P.emailAlt, 'mail', false],
+  ['电话', P.phone, 'tel:' + P.phone, 'phone', false],
+  ['所在地', P.location, '', 'pin', false]
+].map(function (c) {
+  var inner = '<span class="clink-ico">' + (c[3] === 'github' ? icFill('github') : ic(c[3])) + '</span>' +
+    '<span><span class="clink-label">' + esc(c[0]) + '</span><br>' +
+    '<span class="clink-value">' + esc(c[1]) + '</span></span>' +
+    '<span class="clink-arrow" aria-hidden="true">' + (c[2] ? '↗' : '') + '</span>';
+  return c[2]
+    ? '<a class="clink" href="' + esc(c[2]) + '"' + (c[4] ? ' target="_blank" rel="noopener noreferrer"' : '') +
+      ' aria-label="' + esc(c[0] + '：' + c[1]) + '">' + inner + '</a>'
+    : '<div class="clink">' + inner + '</div>';
+}).join('');
+
+$('heroMail').href = $('ctaMail').href = $('islandCta').href = 'mailto:' + P.email;
+$('ctaGh').href = P.github;
+$('year').textContent = new Date().getFullYear();
+
+/* ---------- 迷你头像 ---------- */
+(function () {
+  var box = $('avatarMini');
+  var im = new Image();
+  im.onload = function () {
+    box.textContent = '';
+    var el = document.createElement('img');
+    el.src = 'avatar.jpg'; el.alt = '蔡昕辰的头像';
+    box.appendChild(el);
+  };
+  im.src = 'avatar.jpg';
+})();
+
+/* ---------- 鼠标跟随镜面高光 ----------
+   只在真有指针悬停能力的设备上启用：触摸设备滑动时同样会派发 pointermove，
+   那会在手指滚动过程中持续触发重排取样（getBoundingClientRect）与样式写入。 */
+(function () {
+  if (prefersReduce()) return;
+  if (!window.matchMedia || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  document.querySelectorAll('.spec').forEach(function (el) {
+    el.addEventListener('pointermove', function (e) {
+      var r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+  });
+})();
+
+/* ---------- 移动端汉堡菜单 ---------- */
+(function () {
+  var btn = $('islandBurger'), sheet = $('islandMenu');
+  if (!btn || !sheet) return;
+  function setOpen(open) {
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.setAttribute('aria-label', open ? '关闭导航菜单' : '打开导航菜单');
+    sheet.setAttribute('data-open', open ? 'true' : 'false');
+  }
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    setOpen(btn.getAttribute('aria-expanded') !== 'true');
+  });
+  sheet.addEventListener('click', function (e) {
+    if (e.target.closest('a')) setOpen(false);
+  });
+  document.addEventListener('click', function (e) {
+    if (!sheet.contains(e.target) && !btn.contains(e.target)) setOpen(false);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true') {
+      setOpen(false); btn.focus();
+    }
+  });
+  window.addEventListener('resize', function () {
+    if (window.innerWidth > 1080) setOpen(false);
+  });
+})();
+
+/* ---------- 滚动联动：回到顶部 + 动态岛收缩 ----------
+   原先两个模块各挂一个 scroll 监听，且每次事件都写 DOM（classList / style）。
+   滚动时事件可达每秒上百次，而实际上它们的取值只有两种状态。
+   合并为一个 rAF 节流的处理器，并只在状态真正翻转时才写。 */
+(function () {
+  var isl = $('island'), btn = $('toTop');
+  var shrunk = null, shown = null;
+
+  function apply() {
+    var y = window.scrollY;
+
+    var nextShrunk = y > 90;
+    if (nextShrunk !== shrunk) {
+      shrunk = nextShrunk;
+      isl.style.transform = nextShrunk ? 'scale(.94)' : 'scale(1)';
+      isl.style.padding = nextShrunk ? '5px 7px' : '7px 8px';
+    }
+
+    var nextShown = y > 520;
+    if (nextShown !== shown) {
+      shown = nextShown;
+      btn.classList.toggle('show', nextShown);
+    }
+  }
+
+  btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () { apply(); ticking = false; });
+  }, { passive: true });
+  apply();
+})();
+
+/* ---------- 导航高亮 ----------
+   用「视口 34% 处的探测点」判定当前区块：结果唯一且可预测。
+   原 IntersectionObserver + rootMargin 写法在多个区块同时命中时，
+   结果取决于回调顺序，快速滚动会出现高亮跳错。 */
+(function () {
+  var ids = ['about', 'skills', 'work', 'projects', 'contact'];
+  var current = null;
+  function linkList(id) {
+    return document.querySelectorAll(
+      '#islandLinks a[href="#' + id + '"], #islandMenu a[href="#' + id + '"]');
+  }
+  function update() {
+    var probe = window.innerHeight * 0.34;
+    var found = null;
+    for (var i = 0; i < ids.length; i++) {
+      var el = $(ids[i]);
+      if (!el) continue;
+      var r = el.getBoundingClientRect();
+      if (r.top <= probe && r.bottom > probe) { found = ids[i]; break; }
+    }
+    if (found === current) return;
+    current = found;
+    ids.forEach(function (id) {
+      var hit = (id === found);
+      var list = linkList(id);
+      for (var k = 0; k < list.length; k++) {
+        if (hit) list[k].setAttribute('aria-current', 'true');
+        else list[k].removeAttribute('aria-current');
+      }
+    });
+  }
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () { update(); ticking = false; });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  update();
+})();
+
+console.log('%c蔡昕辰 · AI 应用开发工程师', 'background:linear-gradient(135deg,#6366F1,#A855F7);color:#fff;font-weight:700;padding:3px 8px;border-radius:99px');
+</script>
+</body>
+</html>
